@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import ColorPicker from "@jaames/iro";
+import iro from "@jaames/iro";
 import { QRCodeSVG } from "qrcode.react";
+import { formatCss, converter } from "culori";
 
 // Convert HEX to RGB
 const hexToRGB = (hex: string): [number, number, number] => {
@@ -44,49 +45,95 @@ export default function ColorPickerComponent() {
 
   const colorPickerRef = useRef<HTMLDivElement | null>(null);
 
-useEffect(() => {
-  if (colorPickerRef.current) {
-    const picker = new ColorPicker(colorPickerRef.current, {
-      width: 200,
-      color: color,
-      borderWidth: 1,
-      borderColor: "#fff",
-    });
+  const [r, g, b] = hexToRGB(color);
+  const [h, s, v] = hexToHSV(color);
 
-    picker.on("color:change", (newColor) => {
-      setColor(newColor.hexString);
-    });
+  const hsla = `hsla(${h}, ${s}%, ${v / 2}%, ${alpha})`;
 
-    return () => {
-      picker.off("color:change");
-    };
+  const toOklch = converter("oklch");
+  const oklchColor = toOklch({ mode: "rgb", r: r / 255, g: g / 255, b: b / 255, alpha });
+  const oklchString = oklchColor ? formatOklchString(oklchColor) : "";
+
+  function formatOklchString(oklchColor: { l: number; c: number; h: number; alpha?: number }): string {
+    const { l, c, h, alpha = 1 } = oklchColor;
+    const lFormatted = (l * 100).toFixed(2); // Lightness in %
+    const cFormatted = c.toFixed(4);         // Chroma
+    const hFormatted = h.toFixed(2);         // Hue in degrees
+    const aFormatted = alpha.toFixed(2);
+
+    return `oklch(${lFormatted}% ${cFormatted} ${hFormatted}deg / ${aFormatted})`;
   }
-}, []);
+
+  useEffect(() => {
+    if (colorPickerRef.current) {
+      const picker = new iro.ColorPicker(colorPickerRef.current, {
+        width: 200,
+        color: color,
+        borderWidth: 1,
+        borderColor: "#fff",
+        layout: [
+          { component: iro.ui.Wheel },
+          { component: iro.ui.Slider, options: { sliderType: "hue" } },
+          { component: iro.ui.Slider, options: { sliderType: "value" } },
+          { component: iro.ui.Slider, options: { sliderType: "alpha" } },
+        ],
+      });
+
+      picker.on("color:change", (newColor) => {
+        setColor(newColor.hexString);
+        setAlpha(newColor.alpha);
+      });
 
 
+      const sliders = colorPickerRef.current?.querySelectorAll('.IroSlider');
+        if (sliders && sliders.length >= 3) {
+          const alphaSlider = sliders[2];
+          if (alphaSlider) {
+            (alphaSlider as HTMLElement).style.background =
+              `linear-gradient(to right, rgba(${r}, ${g}, ${b}, 0), rgba(${r}, ${g}, ${b}, 1))`;
+          }
+        }
 
+      return () => {
+        picker.off("color:change");
+      };
+    }
+  }, []);
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(color);
     alert(`Copied ${color} to clipboard`);
   };
 
-  const [r, g, b] = hexToRGB(color);
-  const [h, s, v] = hexToHSV(color);
-
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 p-4">
-      <div className="w-full max-w-md p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md space-y-6">
+      <div className="w-full max-w-[500px] p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md space-y-6">
         <div className="text-center space-y-1">
           <h2 className="text-3xl font-bold text-gray-800 dark:text-white">
             Color Picker
           </h2>
-          <p className="text-gray-600 dark:text-gray-300">
-            Hue wheel + Opacity bar
-          </p>
+          <p className="text-gray-600 dark:text-gray-300">Hue wheel + Opacity bar</p>
         </div>
 
-        <div ref={colorPickerRef}></div>
+        <section className="flex gap-8">
+          <div ref={colorPickerRef}></div>
+
+          <div className="flex flex-col items-center justify-center space-y-2">
+            <QRCodeSVG
+              value="https://www.youtube.com/"
+              size={220}
+              fgColor={`rgba(${r}, ${g}, ${b}, ${alpha})`}
+              bgColor="#ffffff"
+              level="H"
+              includeMargin={true}
+            />
+            <p className="text-sm text-gray-600">QR Code with selected color</p>
+          </div>
+        </section>
+
+       <div style={{ color: `rgba(${r}, ${g}, ${b}, ${alpha})` }}>
+  TEXT COLOR
+</div>
 
         <div className="flex justify-between items-center gap-10 w-full my-[40px]">
           <div
@@ -149,20 +196,25 @@ useEffect(() => {
           )}
         </div>
 
-        {/* QR Code with selected color */}
-        <div className="flex flex-col items-center justify-center mt-6 space-y-2">
-          <QRCodeSVG
-            value="https://www.youtube.com/"
-            size={160}
-            fgColor={`rgba(${r}, ${g}, ${b}, ${alpha})`}
-            bgColor="#ffffff"
-            level="H"
-            includeMargin={true}
-          />
-          <p className="text-sm text-gray-600">QR Code with selected color</p>
+        {/* HSLA & OKLCH */}
+        <div className="space-y-4 text-sm w-full">
+          <div className="flex justify-between items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-md shadow">
+            <span className="font-semibold text-gray-800 dark:text-white">HSLA</span>
+            <code className="text-xs px-2 py-1 bg-white dark:bg-gray-800 text-blue-700 dark:text-blue-300 rounded">
+              {hsla}
+            </code>
+          </div>
+
+          <div className="flex justify-between items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-md shadow">
+            <span className="font-semibold text-gray-800 dark:text-white">OKLCH</span>
+            <code className="text-xs px-2 py-1 bg-white dark:bg-gray-800 text-green-700 dark:text-green-300 rounded">
+              {oklchString}
+            </code>
+          </div>
         </div>
       </div>
     </div>
   );
 }
+
 
