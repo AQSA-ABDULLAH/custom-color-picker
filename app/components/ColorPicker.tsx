@@ -51,14 +51,25 @@ export default function ColorPickerComponent() {
   const hsla = `hsla(${h}, ${s}%, ${v / 2}%, ${alpha})`;
 
   const toOklch = converter("oklch");
-  const oklchColor = toOklch({ mode: "rgb", r: r / 255, g: g / 255, b: b / 255, alpha });
+  const oklchColor = toOklch({
+    mode: "rgb",
+    r: r / 255,
+    g: g / 255,
+    b: b / 255,
+    alpha,
+  });
   const oklchString = oklchColor ? formatOklchString(oklchColor) : "";
 
-  function formatOklchString(oklchColor: { l: number; c: number; h: number; alpha?: number }): string {
+  function formatOklchString(oklchColor: {
+    l: number;
+    c: number;
+    h: number;
+    alpha?: number;
+  }): string {
     const { l, c, h, alpha = 1 } = oklchColor;
     const lFormatted = (l * 100).toFixed(2); // Lightness in %
-    const cFormatted = c.toFixed(4);         // Chroma
-    const hFormatted = h.toFixed(2);         // Hue in degrees
+    const cFormatted = c.toFixed(4); // Chroma
+    const hFormatted = h.toFixed(2); // Hue in degrees
     const aFormatted = alpha.toFixed(2);
 
     return `oklch(${lFormatted}% ${cFormatted} ${hFormatted}deg / ${aFormatted})`;
@@ -84,15 +95,15 @@ export default function ColorPickerComponent() {
         setAlpha(newColor.alpha);
       });
 
-
-      const sliders = colorPickerRef.current?.querySelectorAll('.IroSlider');
-        if (sliders && sliders.length >= 3) {
-          const alphaSlider = sliders[2];
-          if (alphaSlider) {
-            (alphaSlider as HTMLElement).style.background =
-              `linear-gradient(to right, rgba(${r}, ${g}, ${b}, 0), rgba(${r}, ${g}, ${b}, 1))`;
-          }
+      const sliders = colorPickerRef.current?.querySelectorAll(".IroSlider");
+      if (sliders && sliders.length >= 3) {
+        const alphaSlider = sliders[2];
+        if (alphaSlider) {
+          (
+            alphaSlider as HTMLElement
+          ).style.background = `linear-gradient(to right, rgba(${r}, ${g}, ${b}, 0), rgba(${r}, ${g}, ${b}, 1))`;
         }
+      }
 
       return () => {
         picker.off("color:change");
@@ -112,7 +123,9 @@ export default function ColorPickerComponent() {
           <h2 className="text-3xl font-bold text-gray-800 dark:text-white">
             Color Picker
           </h2>
-          <p className="text-gray-600 dark:text-gray-300">Hue wheel + Opacity bar</p>
+          <p className="text-gray-600 dark:text-gray-300">
+            Hue wheel + Opacity bar
+          </p>
         </div>
 
         <section className="flex gap-8">
@@ -131,9 +144,9 @@ export default function ColorPickerComponent() {
           </div>
         </section>
 
-       <div style={{ color: `rgba(${r}, ${g}, ${b}, ${alpha})` }}>
-  TEXT COLOR
-</div>
+        <div style={{ color: `rgba(${r}, ${g}, ${b}, ${alpha})` }}>
+          TEXT COLOR
+        </div>
 
         <div className="flex justify-between items-center gap-10 w-full my-[40px]">
           <div
@@ -166,47 +179,55 @@ export default function ColorPickerComponent() {
 
         {/* RGB Fields */}
         <div className="flex items-center justify-between gap-10 w-full">
-          {[{ label: "r", value: r }, { label: "g", value: g }, { label: "b", value: b }].map(
-            (item, i) => (
-              <div key={i} className="flex gap-3 items-center">
-                <label className="text-gray-600 capitalize">{item.label}</label>
-                <input
-                  value={item.value}
-                  readOnly
-                  className="w-full border px-2 py-1 text-center rounded"
-                />
-              </div>
-            )
-          )}
+          {[
+            { label: "r", value: r },
+            { label: "g", value: g },
+            { label: "b", value: b },
+          ].map((item, i) => (
+            <div key={i} className="flex gap-3 items-center">
+              <label className="text-gray-600 capitalize">{item.label}</label>
+              <input
+                value={item.value}
+                readOnly
+                className="w-full border px-2 py-1 text-center rounded"
+              />
+            </div>
+          ))}
         </div>
 
         {/* HSV Fields */}
         <div className="flex items-center justify-between gap-10 w-full">
-          {[{ label: "h", value: h }, { label: "s", value: s }, { label: "v", value: v }].map(
-            (item, i) => (
-              <div key={i} className="flex gap-3 items-center">
-                <label className="text-gray-600 capitalize">{item.label}</label>
-                <input
-                  value={item.value}
-                  readOnly
-                  className="w-full border px-2 py-1 text-center rounded"
-                />
-              </div>
-            )
-          )}
+          {[
+            { label: "h", value: h },
+            { label: "s", value: s },
+            { label: "v", value: v },
+          ].map((item, i) => (
+            <div key={i} className="flex gap-3 items-center">
+              <label className="text-gray-600 capitalize">{item.label}</label>
+              <input
+                value={item.value}
+                readOnly
+                className="w-full border px-2 py-1 text-center rounded"
+              />
+            </div>
+          ))}
         </div>
 
         {/* HSLA & OKLCH */}
         <div className="space-y-4 text-sm w-full">
           <div className="flex justify-between items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-md shadow">
-            <span className="font-semibold text-gray-800 dark:text-white">HSLA</span>
+            <span className="font-semibold text-gray-800 dark:text-white">
+              HSLA
+            </span>
             <code className="text-xs px-2 py-1 bg-white dark:bg-gray-800 text-blue-700 dark:text-blue-300 rounded">
               {hsla}
             </code>
           </div>
 
           <div className="flex justify-between items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-md shadow">
-            <span className="font-semibold text-gray-800 dark:text-white">OKLCH</span>
+            <span className="font-semibold text-gray-800 dark:text-white">
+              OKLCH
+            </span>
             <code className="text-xs px-2 py-1 bg-white dark:bg-gray-800 text-green-700 dark:text-green-300 rounded">
               {oklchString}
             </code>
@@ -216,5 +237,3 @@ export default function ColorPickerComponent() {
     </div>
   );
 }
-
-
