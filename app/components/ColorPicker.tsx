@@ -183,9 +183,28 @@ export default function ColorPickerComponent() {
             </svg>
           </button>
 
-          <div className="text-[18px] text-gray-800 border-1 rounded-md px-4">
-            {color}
-          </div>
+          <input
+            type="text"
+            value={color}
+            onChange={(e) => {
+              const hex = e.target.value;
+              setColor(hex); // always update color string
+
+              const isValidHex = /^#([0-9A-Fa-f]{6})$/i.test(hex);
+              if (isValidHex) {
+                const [newHue, s, v] = hexToHSV(hex);
+                setHue(newHue);
+
+                // Update pointer position based on hue (angle on circle)
+                const radius = 88; // radius in px (half of your 176px wheel size - 44px)
+                const angleRad = (newHue * Math.PI) / 180;
+                const x = radius * Math.cos(angleRad);
+                const y = radius * Math.sin(angleRad);
+                setPointerPos({ x, y });
+              }
+            }}
+            className="text-[18px] text-gray-800 border rounded-md px-4 py-1 w-[120px]"
+          />
         </div>
 
         {/* RGB Fields */}
