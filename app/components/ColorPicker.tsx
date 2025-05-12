@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import iro, { ColorPicker, Color } from "@jaames/iro";
-
-import chroma from "chroma-js";
+import ColorPicker from "@jaames/iro";
 import { QRCodeSVG } from "qrcode.react";
 
 // Convert HEX to RGB
@@ -48,23 +46,23 @@ export default function ColorPickerComponent() {
 
 useEffect(() => {
   if (colorPickerRef.current) {
-    const picker = new iro.ColorPicker(colorPickerRef.current, {
+    const picker = new ColorPicker(colorPickerRef.current, {
       width: 200,
       color: color,
       borderWidth: 1,
       borderColor: "#fff",
     });
 
-    picker.on("color:change", (newColor: iro.Color) => {
+    picker.on("color:change", (newColor) => {
       setColor(newColor.hexString);
     });
 
-    // Cleanup if component unmounts
     return () => {
       picker.off("color:change");
     };
   }
 }, []);
+
 
 
 
