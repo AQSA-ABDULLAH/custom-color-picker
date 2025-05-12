@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import iro from "@jaames/iro";
+import chroma from "chroma-js";
 import { QRCodeSVG } from "qrcode.react";
 
 // Convert HSV to HEX
@@ -49,33 +51,31 @@ const hexToHSV = (hex: string): [number, number, number] => {
 export default function ColorPickerComponent() {
   const [hue, setHue] = useState(0);
   const [alpha, setAlpha] = useState(1);
-  const [color, setColor] = useState(HSVtoHex(0, 1, 1));
   const [copied, setCopied] = useState(false);
   const [pointerPos, setPointerPos] = useState({ x: 0, y: 0 });
+  const colorPickerRef = useRef(null);
+  const [color, setColor] = useState("#ff0000");
 
-  const handleHueChange = (e: React.MouseEvent | MouseEvent) => {
-    const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
-    const x = e.clientX - rect.left - rect.width / 2;
-    const y = e.clientY - rect.top - rect.height / 2;
 
-    const angle = Math.atan2(y, x) * (180 / Math.PI);
-    const newHue = (angle + 360) % 360;
-    setHue(newHue);
+  useEffect(() => {
+    if (colorPickerRef.current) {
+      const picker = new iro.ColorPicker(colorPickerRef.current, {
+        width: 200,
+        color: color,
+        borderWidth: 1,
+        borderColor: "#fff",
+      });
 
-    const newHex = HSVtoHex(newHue, 1, 1);
-    setColor(newHex);
+      picker.on("color:change", (newColor) => {
+        setColor(newColor.hexString);
+      });
+    }
+  }, []);
 
-    setPointerPos({ x, y });
-  };
 
-  const handleAlphaChange = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const y = e.clientY - rect.top;
-    const newAlpha = 1 - y / rect.height;
-    setAlpha(Math.max(0, Math.min(1, newAlpha)));
-  };
+  
 
-   const copyToClipboard = () => {
+  const copyToClipboard = () => {
     navigator.clipboard.writeText(color);
     alert(`Copied ${color} to clipboard`);
   };
@@ -95,54 +95,7 @@ export default function ColorPickerComponent() {
           </p>
         </div>
 
-        <section className="flex gap-6 justify-center items-center cursor-pointer">
-          <div
-            onMouseDown={(e) => {
-              handleHueChange(e);
-
-              const onMouseMove = (e: MouseEvent) => handleHueChange(e as any);
-              const onMouseUp = () => {
-                document.removeEventListener("mousemove", onMouseMove);
-                document.removeEventListener("mouseup", onMouseUp);
-              };
-
-              document.addEventListener("mousemove", onMouseMove);
-              document.addEventListener("mouseup", onMouseUp);
-            }}
-            className="w-44 h-44 rounded-full border border-gray-300 dark:border-gray-700 relative"
-            style={{
-              background:
-                "conic-gradient(from 90deg, red, yellow, lime, cyan, blue, magenta, red)",
-            }}
-          >
-            {/* Pointer that shows hue angle */}
-            <div
-              className="absolute w-4 h-4 rounded-full border-2 border-white shadow-md pointer-events-none"
-              style={{
-                backgroundColor: color,
-                top: "50%",
-                left: "50%",
-                transform: `translate(${pointerPos.x}px, ${pointerPos.y}px)`,
-              }}
-            />
-          </div>
-
-          <div
-            onClick={handleAlphaChange}
-            className="h-44 w-5 relative cursor-pointer border-1"
-            style={{
-              background: `linear-gradient(to top, rgba(${r}, ${g}, ${b}, 0), rgba(${r}, ${g}, ${b}, 1))`,
-            }}
-          >
-            <div
-              className="absolute left-[-7px] w-8 h-[10px] shadow-sm rounded-sm border-2 border-black"
-              style={{
-                top: `${(1 - alpha) * 100}%`,
-                transform: "translateY(-50%)",
-              }}
-            />
-          </div>
-        </section>
+        <div ref={colorPickerRef}></div>
 
         <div className="flex justify-between items-center gap-10 w-full my-[40px]">
           <div
@@ -151,11 +104,11 @@ export default function ColorPickerComponent() {
           />
 
           <button
-          onClick={copyToClipboard}
-          className="w- bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
-        >
-          Copy
-        </button>
+            onClick={copyToClipboard}
+            className="w- bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
+          >
+            Copy
+          </button>
 
           <input
             type="text"
@@ -177,7 +130,7 @@ export default function ColorPickerComponent() {
                 setPointerPos({ x, y });
               }
             }}
-            className="text-[18px] text-gray-800 border border-white text-white rounded-md px-4 py-1 w-[120px]"
+            className="text-[18px] border border-white text-white rounded-md px-4 py-1 w-[120px]"
           />
         </div>
 
@@ -222,27 +175,27 @@ export default function ColorPickerComponent() {
           <div className="flex gap-3 items-center">
             <label className="text-gray-600 capitalize">hex</label>
             <input
-            type="text"
-            value={color}
-            onChange={(e) => {
-              const hex = e.target.value;
-              setColor(hex); // always update color string
+              type="text"
+              value={color}
+              onChange={(e) => {
+                const hex = e.target.value;
+                setColor(hex); // always update color string
 
-              const isValidHex = /^#([0-9A-Fa-f]{6})$/i.test(hex);
-              if (isValidHex) {
-                const [newHue, s, v] = hexToHSV(hex);
-                setHue(newHue);
+                const isValidHex = /^#([0-9A-Fa-f]{6})$/i.test(hex);
+                if (isValidHex) {
+                  const [newHue, s, v] = hexToHSV(hex);
+                  setHue(newHue);
 
-                // Update pointer position based on hue (angle on circle)
-                const radius = 88; // radius in px (half of your 176px wheel size - 44px)
-                const angleRad = (newHue * Math.PI) / 180;
-                const x = radius * Math.cos(angleRad);
-                const y = radius * Math.sin(angleRad);
-                setPointerPos({ x, y });
-              }
-            }}
-            className="text-[18px] text-gray-800 borderrounded-md px-4 py-1 w-[120px]"
-          />
+                  // Update pointer position based on hue (angle on circle)
+                  const radius = 88; // radius in px (half of your 176px wheel size - 44px)
+                  const angleRad = (newHue * Math.PI) / 180;
+                  const x = radius * Math.cos(angleRad);
+                  const y = radius * Math.sin(angleRad);
+                  setPointerPos({ x, y });
+                }
+              }}
+              className="text-[18px] text-gray-800 borderrounded-md px-4 py-1 w-[120px]"
+            />
           </div>
         </div>
 
