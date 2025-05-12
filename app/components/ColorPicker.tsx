@@ -1,26 +1,17 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import iro from "@jaames/iro";
+import iro, { ColorPicker, Color } from "@jaames/iro";
+
 import chroma from "chroma-js";
 import { QRCodeSVG } from "qrcode.react";
 
-// Convert HSV to HEX
-function HSVtoHex(h: number, s: number, v: number) {
-  let f = (n: number, k = (n + h / 60) % 6) =>
-    v - v * s * Math.max(Math.min(k, 4 - k, 1), 0);
-  const r = Math.round(f(5) * 255);
-  const g = Math.round(f(3) * 255);
-  const b = Math.round(f(1) * 255);
-  return `#${[r, g, b].map((x) => x.toString(16).padStart(2, "0")).join("")}`;
-}
-
-// Convert HEX to RGB string
+// Convert HEX to RGB
 const hexToRGB = (hex: string): [number, number, number] => {
   const r = parseInt(hex.slice(1, 3), 16);
   const g = parseInt(hex.slice(3, 5), 16);
   const b = parseInt(hex.slice(5, 7), 16);
-  return [r, g, b]; // ✅ return array
+  return [r, g, b];
 };
 
 // Convert HEX to HSV
@@ -51,29 +42,31 @@ const hexToHSV = (hex: string): [number, number, number] => {
 export default function ColorPickerComponent() {
   const [hue, setHue] = useState(0);
   const [alpha, setAlpha] = useState(1);
-  const [copied, setCopied] = useState(false);
-  const [pointerPos, setPointerPos] = useState({ x: 0, y: 0 });
-  const colorPickerRef = useRef(null);
   const [color, setColor] = useState("#ff0000");
 
+  const colorPickerRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    if (colorPickerRef.current) {
-      const picker = new iro.ColorPicker(colorPickerRef.current, {
-        width: 200,
-        color: color,
-        borderWidth: 1,
-        borderColor: "#fff",
-      });
+useEffect(() => {
+  if (colorPickerRef.current) {
+    const picker = new iro.ColorPicker(colorPickerRef.current, {
+      width: 200,
+      color: color,
+      borderWidth: 1,
+      borderColor: "#fff",
+    });
 
-      picker.on("color:change", (newColor) => {
-        setColor(newColor.hexString);
-      });
-    }
-  }, []);
+    picker.on("color:change", (newColor: iro.Color) => {
+      setColor(newColor.hexString);
+    });
+
+    // Cleanup if component unmounts
+    return () => {
+      picker.off("color:change");
+    };
+  }
+}, []);
 
 
-  
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(color);
@@ -99,13 +92,13 @@ export default function ColorPickerComponent() {
 
         <div className="flex justify-between items-center gap-10 w-full my-[40px]">
           <div
-            className="w-8 h-8 rounded-lg border-1"
-            style={{ backgroundColor: `rgba(${hexToRGB(color)}, ${alpha})` }}
+            className="w-8 h-8 rounded-lg border border-gray-400"
+            style={{ backgroundColor: `rgba(${r}, ${g}, ${b}, ${alpha})` }}
           />
 
           <button
             onClick={copyToClipboard}
-            className="w- bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
+            className="w-[100px] bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
           >
             Copy
           </button>
@@ -115,88 +108,47 @@ export default function ColorPickerComponent() {
             value={color}
             onChange={(e) => {
               const hex = e.target.value;
-              setColor(hex); // always update color string
-
+              setColor(hex);
               const isValidHex = /^#([0-9A-Fa-f]{6})$/i.test(hex);
               if (isValidHex) {
-                const [newHue, s, v] = hexToHSV(hex);
+                const [newHue] = hexToHSV(hex);
                 setHue(newHue);
-
-                // Update pointer position based on hue (angle on circle)
-                const radius = 88; // radius in px (half of your 176px wheel size - 44px)
-                const angleRad = (newHue * Math.PI) / 180;
-                const x = radius * Math.cos(angleRad);
-                const y = radius * Math.sin(angleRad);
-                setPointerPos({ x, y });
               }
             }}
-            className="text-[18px] border border-white text-white rounded-md px-4 py-1 w-[120px]"
+            className="text-[18px] border border-white text-white rounded-md px-4 py-1 w-[120px] bg-transparent"
           />
         </div>
 
         {/* RGB Fields */}
         <div className="flex items-center justify-between gap-10 w-full">
-          {[
-            { label: "r", value: r },
-            { label: "g", value: g },
-            { label: "b", value: b },
-          ].map((item, i) => (
-            <div key={i} className="flex gap-3 items-center">
-              <label className="text-gray-600 capitalize">{item.label}</label>
-              <input
-                value={item.value}
-                readOnly
-                className="w-full border px-2 py-1 text-center rounded"
-              />
-            </div>
-          ))}
+          {[{ label: "r", value: r }, { label: "g", value: g }, { label: "b", value: b }].map(
+            (item, i) => (
+              <div key={i} className="flex gap-3 items-center">
+                <label className="text-gray-600 capitalize">{item.label}</label>
+                <input
+                  value={item.value}
+                  readOnly
+                  className="w-full border px-2 py-1 text-center rounded"
+                />
+              </div>
+            )
+          )}
         </div>
 
         {/* HSV Fields */}
         <div className="flex items-center justify-between gap-10 w-full">
-          {[
-            { label: "h", value: h },
-            { label: "s", value: s },
-            { label: "v", value: v },
-          ].map((item, i) => (
-            <div key={i} className="flex gap-3 items-center">
-              <label className="text-gray-600 capitalize">{item.label}</label>
-              <input
-                value={item.value}
-                readOnly
-                className="w-full border px-2 py-1 text-center rounded"
-              />
-            </div>
-          ))}
-        </div>
-
-        {/* HEX Field */}
-        <div className="flex items-center justify-between gap-10 w-full">
-          <div className="flex gap-3 items-center">
-            <label className="text-gray-600 capitalize">hex</label>
-            <input
-              type="text"
-              value={color}
-              onChange={(e) => {
-                const hex = e.target.value;
-                setColor(hex); // always update color string
-
-                const isValidHex = /^#([0-9A-Fa-f]{6})$/i.test(hex);
-                if (isValidHex) {
-                  const [newHue, s, v] = hexToHSV(hex);
-                  setHue(newHue);
-
-                  // Update pointer position based on hue (angle on circle)
-                  const radius = 88; // radius in px (half of your 176px wheel size - 44px)
-                  const angleRad = (newHue * Math.PI) / 180;
-                  const x = radius * Math.cos(angleRad);
-                  const y = radius * Math.sin(angleRad);
-                  setPointerPos({ x, y });
-                }
-              }}
-              className="text-[18px] text-gray-800 borderrounded-md px-4 py-1 w-[120px]"
-            />
-          </div>
+          {[{ label: "h", value: h }, { label: "s", value: s }, { label: "v", value: v }].map(
+            (item, i) => (
+              <div key={i} className="flex gap-3 items-center">
+                <label className="text-gray-600 capitalize">{item.label}</label>
+                <input
+                  value={item.value}
+                  readOnly
+                  className="w-full border px-2 py-1 text-center rounded"
+                />
+              </div>
+            )
+          )}
         </div>
 
         {/* QR Code with selected color */}
@@ -215,3 +167,4 @@ export default function ColorPickerComponent() {
     </div>
   );
 }
+
