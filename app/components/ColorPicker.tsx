@@ -75,12 +75,9 @@ export default function ColorPickerComponent() {
     setAlpha(Math.max(0, Math.min(1, newAlpha)));
   };
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(
-      `rgba(${hexToRGB(color).join(", ")}, ${alpha.toFixed(2)})`
-    );
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+   const copyToClipboard = () => {
+    navigator.clipboard.writeText(color);
+    alert(`Copied ${color} to clipboard`);
   };
 
   const [r, g, b] = hexToRGB(color);
@@ -153,35 +150,12 @@ export default function ColorPickerComponent() {
             style={{ backgroundColor: `rgba(${hexToRGB(color)}, ${alpha})` }}
           />
 
-          <button onClick={copyToClipboard} className="cursor-pointer">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-7 w-7"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </button>
-
-          <button className="cursor-pointer">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-7 w-7"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </button>
+          <button
+          onClick={copyToClipboard}
+          className="w- bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
+        >
+          Copy
+        </button>
 
           <input
             type="text"
