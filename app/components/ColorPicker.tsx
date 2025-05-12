@@ -222,6 +222,18 @@ export default function ColorPickerComponent() {
             </div>
           ))}
         </div>
+
+        {/* HEX Field */}
+        <div className="flex items-center justify-between gap-10 w-full">
+          <div className="flex gap-3 items-center">
+            <label className="text-gray-600 capitalize">hex</label>
+            <input
+              value={color}
+              readOnly
+              className="w-full border px-2 py-1 text-center rounded"
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
