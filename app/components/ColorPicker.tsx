@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { QRCodeSVG } from "qrcode.react";
 
 // Convert HSV to HEX
 function HSVtoHex(h: number, s: number, v: number) {
@@ -233,6 +234,19 @@ export default function ColorPickerComponent() {
               className="w-full border px-2 py-1 text-center rounded"
             />
           </div>
+        </div>
+
+        {/* QR Code with selected color */}
+        <div className="flex flex-col items-center justify-center mt-6 space-y-2">
+          <QRCodeSVG
+            value="https://www.youtube.com/"
+            size={160}
+            fgColor={`rgba(${r}, ${g}, ${b}, ${alpha})`}
+            bgColor="#ffffff"
+            level="H"
+            includeMargin={true}
+          />
+          <p className="text-sm text-gray-600">QR Code with selected color</p>
         </div>
       </div>
     </div>
