@@ -1,10 +1,10 @@
 import React from "react";
-import ColorPickerComponent from "./components/ColorPicker";
+import GradientComponent from "./components/GradientPicker"
 
 function page() {
   return (
     <div>
-      <ColorPickerComponent />
+      <GradientComponent />
     </div>
   );
 }
