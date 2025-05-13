@@ -75,7 +75,7 @@ export default function GradientComponent() {
     <div
       className="card"
       style={{
-        backgroundColor: `rgba(${r}, ${g}, ${b}, ${alpha})`,
+        backgroundColor: `grey`,
         padding: "24px",
         minHeight: "100vh",
       }}
