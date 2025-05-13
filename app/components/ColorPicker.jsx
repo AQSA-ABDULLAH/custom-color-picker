@@ -6,7 +6,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { formatCss, converter } from "culori";
 
 // Convert HEX to RGB
-const hexToRGB = (hex: string): [number, number, number] => {
+const hexToRGB = (hex) => {
   const r = parseInt(hex.slice(1, 3), 16);
   const g = parseInt(hex.slice(3, 5), 16);
   const b = parseInt(hex.slice(5, 7), 16);
@@ -14,7 +14,7 @@ const hexToRGB = (hex: string): [number, number, number] => {
 };
 
 // Convert HEX to HSV
-const hexToHSV = (hex: string): [number, number, number] => {
+const hexToHSV = (hex) => {
   const r = parseInt(hex.slice(1, 3), 16) / 255;
   const g = parseInt(hex.slice(3, 5), 16) / 255;
   const b = parseInt(hex.slice(5, 7), 16) / 255;
@@ -43,7 +43,8 @@ export default function ColorPickerComponent() {
   const [alpha, setAlpha] = useState(1);
   const [color, setColor] = useState("#ff0000");
 
-  const colorPickerRef = useRef<HTMLDivElement | null>(null);
+  const colorPickerRef = useRef(null);
+  const iroPicker = useRef(null);
 
   const [r, g, b] = hexToRGB(color);
   const [h, s, v] = hexToHSV(color);
@@ -60,23 +61,15 @@ export default function ColorPickerComponent() {
   });
   const oklchString = oklchColor ? formatOklchString(oklchColor) : "";
 
-  function formatOklchString(oklchColor: {
-    l: number;
-    c: number;
-    h?: number;
-    alpha?: number;
-  }): string {
+  function formatOklchString(oklchColor) {
     const { l, c, h, alpha = 1 } = oklchColor;
-
-    const lFormatted = (l * 100).toFixed(2); // Lightness in %
-    const cFormatted = c.toFixed(4); // Chroma
-    const hFormatted = h !== undefined ? h.toFixed(2) : "0.00"; // Prevent crash if undefined
+    const lFormatted = (l * 100).toFixed(2);
+    const cFormatted = c.toFixed(4);
+    const hFormatted = h !== undefined ? h.toFixed(2) : "0.00";
     const aFormatted = alpha.toFixed(2);
 
     return `oklch(${lFormatted}% ${cFormatted} ${hFormatted}deg / ${aFormatted})`;
   }
-
-  const iroPicker = useRef<any>(null);
 
   useEffect(() => {
     if (colorPickerRef.current) {
@@ -93,7 +86,7 @@ export default function ColorPickerComponent() {
         ],
       });
 
-      iroPicker.current = picker; // 👈 Save picker reference
+      iroPicker.current = picker;
 
       picker.on("color:change", (newColor) => {
         setColor(newColor.hexString);
@@ -104,9 +97,7 @@ export default function ColorPickerComponent() {
       if (sliders && sliders.length >= 3) {
         const alphaSlider = sliders[2];
         if (alphaSlider) {
-          (
-            alphaSlider as HTMLElement
-          ).style.background = `linear-gradient(to right, rgba(${r}, ${g}, ${b}, 0), rgba(${r}, ${g}, ${b}, 1))`;
+          alphaSlider.style.background = `linear-gradient(to right, rgba(${r}, ${g}, ${b}, 0), rgba(${r}, ${g}, ${b}, 1))`;
         }
       }
 
@@ -128,19 +119,14 @@ export default function ColorPickerComponent() {
         backgroundColor: `rgba(${r}, ${g}, ${b}, ${alpha})`,
         color: "var(--card-text)",
         padding: "24px",
-        minHeight: "100vh", // make sure it fills the screen
+        minHeight: "100vh",
       }}
     >
       <div className="flex flex-col items-center justify-center min-h-screen">
         <div className="w-full max-w-[500px] bg-[#ffff] p-6 rounded-xl shadow-md space-y-6">
-          <div
-            className="text-center space-y-1"
-            style={{
-              color: "var(--card-text)",
-            }}
-          >
+          <div className="text-center space-y-1">
             <h2 className="text-3xl font-bold">Color Picker</h2>
-            <p className="">Hue wheel + Opacity bar</p>
+            <p>Hue wheel + Opacity bar</p>
           </div>
 
           <section className="flex flex-col md:flex-row items-center gap-8">
@@ -190,7 +176,6 @@ export default function ColorPickerComponent() {
                   const [newHue] = hexToHSV(hex);
                   setHue(newHue);
 
-                  // 👇 Update the color picker UI too!
                   if (iroPicker.current) {
                     iroPicker.current.color.hexString = hex;
                   }
@@ -200,57 +185,34 @@ export default function ColorPickerComponent() {
             />
           </div>
 
-          {/* RGB Fields */}
           <div className="flex items-center justify-between gap-10 w-full">
-            {[
-              { label: "r", value: r },
-              { label: "g", value: g },
-              { label: "b", value: b },
-            ].map((item, i) => (
+            {[{ label: "r", value: r }, { label: "g", value: g }, { label: "b", value: b }].map((item, i) => (
               <div key={i} className="flex gap-3 items-center">
                 <label className="text-gray-600 capitalize">{item.label}</label>
-                <input
-                  value={item.value}
-                  readOnly
-                  className="w-full border px-2 py-1 text-center rounded"
-                />
+                <div className="w-[80px] border px-2 py-1 text-center rounded">{item.value}</div>
               </div>
             ))}
           </div>
 
-          {/* HSV Fields */}
           <div className="flex items-center justify-between gap-10 w-full">
-            {[
-              { label: "h", value: h },
-              { label: "s", value: s },
-              { label: "v", value: v },
-            ].map((item, i) => (
+            {[{ label: "h", value: h }, { label: "s", value: s }, { label: "v", value: v }].map((item, i) => (
               <div key={i} className="flex gap-3 items-center">
                 <label className="text-gray-600 capitalize">{item.label}</label>
-                <input
-                  value={item.value}
-                  readOnly
-                  className="w-full border px-2 py-1 text-center rounded"
-                />
+                <div className="w-[80px] border px-2 py-1 text-center rounded">{item.value}</div>
               </div>
             ))}
           </div>
 
-          {/* HSLA & OKLCH */}
           <div className="space-y-4 text-sm w-full">
             <div className="flex justify-between items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-md shadow">
-              <span className="font-semibold text-gray-800 dark:text-white">
-                HSLA
-              </span>
+              <span className="font-semibold text-gray-800 dark:text-white">HSLA</span>
               <code className="text-xs px-2 py-1 bg-white dark:bg-gray-800 text-blue-700 dark:text-blue-300 rounded">
                 {hsla}
               </code>
             </div>
 
             <div className="flex justify-between items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-md shadow">
-              <span className="font-semibold text-gray-800 dark:text-white">
-                OKLCH
-              </span>
+              <span className="font-semibold text-gray-800 dark:text-white">OKLCH</span>
               <code className="text-xs px-2 py-1 bg-white dark:bg-gray-800 text-green-700 dark:text-green-300 rounded">
                 {oklchString}
               </code>
