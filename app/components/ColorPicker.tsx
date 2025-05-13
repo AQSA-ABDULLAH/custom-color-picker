@@ -117,120 +117,133 @@ export default function ColorPickerComponent() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 p-4">
-      <div className="w-full max-w-[500px] p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md space-y-6">
-        <div className="text-center space-y-1">
-          <h2 className="text-3xl font-bold text-gray-800 dark:text-white">
-            Color Picker
-          </h2>
-          <p className="text-gray-600 dark:text-gray-300">
-            Hue wheel + Opacity bar
-          </p>
-        </div>
-
-        <section className="flex gap-8">
-          <div ref={colorPickerRef}></div>
-
-          <div className="flex flex-col items-center justify-center space-y-2">
-            <QRCodeSVG
-              value="https://www.youtube.com/"
-              size={220}
-              fgColor={`rgba(${r}, ${g}, ${b}, ${alpha})`}
-              bgColor="#ffffff"
-              level="H"
-              includeMargin={true}
-            />
-            <p className="text-sm text-gray-600">QR Code with selected color</p>
-          </div>
-        </section>
-
-        <div style={{ color: `rgba(${r}, ${g}, ${b}, ${alpha})` }}>
-          TEXT COLOR
-        </div>
-
-        <div className="flex justify-between items-center gap-10 w-full my-[40px]">
+    <div
+      className="card"
+      style={{
+        backgroundColor: `rgba(${r}, ${g}, ${b}, ${alpha})`,
+        color: "var(--card-text)",
+        padding: "24px",
+        minHeight: "100vh", // make sure it fills the screen
+      }}
+    >
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <div className="w-full max-w-[500px] bg-[#ffff] p-6 rounded-xl shadow-md space-y-6">
           <div
-            className="w-8 h-8 rounded-lg border border-gray-400"
-            style={{ backgroundColor: `rgba(${r}, ${g}, ${b}, ${alpha})` }}
-          />
-
-          <button
-            onClick={copyToClipboard}
-            className="w-[100px] bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
-          >
-            Copy
-          </button>
-
-          <input
-            type="text"
-            value={color}
-            onChange={(e) => {
-              const hex = e.target.value;
-              setColor(hex);
-              const isValidHex = /^#([0-9A-Fa-f]{6})$/i.test(hex);
-              if (isValidHex) {
-                const [newHue] = hexToHSV(hex);
-                setHue(newHue);
-              }
+            className="text-center space-y-1"
+            style={{
+              color: "var(--card-text)",
             }}
-            className="text-[18px] border border-white text-white rounded-md px-4 py-1 w-[120px] bg-transparent"
-          />
-        </div>
-
-        {/* RGB Fields */}
-        <div className="flex items-center justify-between gap-10 w-full">
-          {[
-            { label: "r", value: r },
-            { label: "g", value: g },
-            { label: "b", value: b },
-          ].map((item, i) => (
-            <div key={i} className="flex gap-3 items-center">
-              <label className="text-gray-600 capitalize">{item.label}</label>
-              <input
-                value={item.value}
-                readOnly
-                className="w-full border px-2 py-1 text-center rounded"
-              />
-            </div>
-          ))}
-        </div>
-
-        {/* HSV Fields */}
-        <div className="flex items-center justify-between gap-10 w-full">
-          {[
-            { label: "h", value: h },
-            { label: "s", value: s },
-            { label: "v", value: v },
-          ].map((item, i) => (
-            <div key={i} className="flex gap-3 items-center">
-              <label className="text-gray-600 capitalize">{item.label}</label>
-              <input
-                value={item.value}
-                readOnly
-                className="w-full border px-2 py-1 text-center rounded"
-              />
-            </div>
-          ))}
-        </div>
-
-        {/* HSLA & OKLCH */}
-        <div className="space-y-4 text-sm w-full">
-          <div className="flex justify-between items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-md shadow">
-            <span className="font-semibold text-gray-800 dark:text-white">
-              HSLA
-            </span>
-            <code className="text-xs px-2 py-1 bg-white dark:bg-gray-800 text-blue-700 dark:text-blue-300 rounded">
-              {hsla}
-            </code>
+          >
+            <h2 className="text-3xl font-bold">Color Picker</h2>
+            <p className="">Hue wheel + Opacity bar</p>
           </div>
 
-          <div className="flex justify-between items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-md shadow">
-            <span className="font-semibold text-gray-800 dark:text-white">
-              OKLCH
-            </span>
-            <code className="text-xs px-2 py-1 bg-white dark:bg-gray-800 text-green-700 dark:text-green-300 rounded">
-              {oklchString}
-            </code>
+          <section className="flex flex-col md:flex-row items-center gap-8">
+            <div ref={colorPickerRef}></div>
+
+            <div className="flex flex-col items-center justify-center space-y-2">
+              <QRCodeSVG
+                value="https://www.youtube.com/"
+                size={220}
+                fgColor={`rgba(${r}, ${g}, ${b}, ${alpha})`}
+                bgColor="transparent"
+                level="H"
+                includeMargin={true}
+              />
+              <p className="text-sm text-gray-600">
+                QR Code with selected color
+              </p>
+            </div>
+          </section>
+
+          <div style={{ color: `rgba(${r}, ${g}, ${b}, ${alpha})` }}>
+            TEXT COLOR
+          </div>
+
+          <div className="flex justify-between items-center gap-10 w-full my-[40px]">
+            <div
+              className="w-8 h-8 rounded-lg border border-gray-400"
+              style={{ backgroundColor: `rgba(${r}, ${g}, ${b}, ${alpha})` }}
+            />
+
+            <button
+              onClick={copyToClipboard}
+              className="w-[100px] bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
+            >
+              Copy
+            </button>
+
+            <input
+              type="text"
+              value={color}
+              onChange={(e) => {
+                const hex = e.target.value;
+                setColor(hex);
+                const isValidHex = /^#([0-9A-Fa-f]{6})$/i.test(hex);
+                if (isValidHex) {
+                  const [newHue] = hexToHSV(hex);
+                  setHue(newHue);
+                }
+              }}
+              className="text-[18px] border border-white text-white rounded-md px-4 py-1 w-[120px] bg-transparent"
+            />
+          </div>
+
+          {/* RGB Fields */}
+          <div className="flex items-center justify-between gap-10 w-full">
+            {[
+              { label: "r", value: r },
+              { label: "g", value: g },
+              { label: "b", value: b },
+            ].map((item, i) => (
+              <div key={i} className="flex gap-3 items-center">
+                <label className="text-gray-600 capitalize">{item.label}</label>
+                <input
+                  value={item.value}
+                  readOnly
+                  className="w-full border px-2 py-1 text-center rounded"
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* HSV Fields */}
+          <div className="flex items-center justify-between gap-10 w-full">
+            {[
+              { label: "h", value: h },
+              { label: "s", value: s },
+              { label: "v", value: v },
+            ].map((item, i) => (
+              <div key={i} className="flex gap-3 items-center">
+                <label className="text-gray-600 capitalize">{item.label}</label>
+                <input
+                  value={item.value}
+                  readOnly
+                  className="w-full border px-2 py-1 text-center rounded"
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* HSLA & OKLCH */}
+          <div className="space-y-4 text-sm w-full">
+            <div className="flex justify-between items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-md shadow">
+              <span className="font-semibold text-gray-800 dark:text-white">
+                HSLA
+              </span>
+              <code className="text-xs px-2 py-1 bg-white dark:bg-gray-800 text-blue-700 dark:text-blue-300 rounded">
+                {hsla}
+              </code>
+            </div>
+
+            <div className="flex justify-between items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-md shadow">
+              <span className="font-semibold text-gray-800 dark:text-white">
+                OKLCH
+              </span>
+              <code className="text-xs px-2 py-1 bg-white dark:bg-gray-800 text-green-700 dark:text-green-300 rounded">
+                {oklchString}
+              </code>
+            </div>
           </div>
         </div>
       </div>
