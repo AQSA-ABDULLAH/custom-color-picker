@@ -63,17 +63,20 @@ export default function ColorPickerComponent() {
   function formatOklchString(oklchColor: {
     l: number;
     c: number;
-    h: number;
+    h?: number;
     alpha?: number;
   }): string {
     const { l, c, h, alpha = 1 } = oklchColor;
+
     const lFormatted = (l * 100).toFixed(2); // Lightness in %
     const cFormatted = c.toFixed(4); // Chroma
-    const hFormatted = h.toFixed(2); // Hue in degrees
+    const hFormatted = h !== undefined ? h.toFixed(2) : "0.00"; // Prevent crash if undefined
     const aFormatted = alpha.toFixed(2);
 
     return `oklch(${lFormatted}% ${cFormatted} ${hFormatted}deg / ${aFormatted})`;
   }
+
+  const iroPicker = useRef<any>(null);
 
   useEffect(() => {
     if (colorPickerRef.current) {
@@ -89,6 +92,8 @@ export default function ColorPickerComponent() {
           { component: iro.ui.Slider, options: { sliderType: "alpha" } },
         ],
       });
+
+      iroPicker.current = picker; // 👈 Save picker reference
 
       picker.on("color:change", (newColor) => {
         setColor(newColor.hexString);
@@ -179,13 +184,19 @@ export default function ColorPickerComponent() {
               onChange={(e) => {
                 const hex = e.target.value;
                 setColor(hex);
+
                 const isValidHex = /^#([0-9A-Fa-f]{6})$/i.test(hex);
                 if (isValidHex) {
                   const [newHue] = hexToHSV(hex);
                   setHue(newHue);
+
+                  // 👇 Update the color picker UI too!
+                  if (iroPicker.current) {
+                    iroPicker.current.color.hexString = hex;
+                  }
                 }
               }}
-              className="text-[18px] border border-white text-white rounded-md px-4 py-1 w-[120px] bg-transparent"
+              className="text-[18px] border rounded-md px-4 py-1 w-[120px] bg-transparent"
             />
           </div>
 
