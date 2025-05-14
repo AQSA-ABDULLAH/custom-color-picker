@@ -1,5 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import QRCode from "qrcode";
+
 import iro from "@jaames/iro";
 
 const hexToRGB = (hex) => {
@@ -14,6 +16,7 @@ export default function GradientComponent() {
   const [hexInputs, setHexInputs] = useState(["#ff0000", "#0000ff"]);
   const [gradientType, setGradientType] = useState("linear");
   const [angle, setAngle] = useState(90);
+  const [qrPath, setQrPath] = useState("");
 
   const colorPickerRefs = useRef([]);
   const pickerInstances = useRef([]);
@@ -33,6 +36,18 @@ export default function GradientComponent() {
     navigator.clipboard.writeText(text);
     alert(`Copied to clipboard:\n${text}`);
   };
+
+  // QR Gradient
+  useEffect(() => {
+    QRCode.toString("https://www.youtube.com/", { type: "svg" }, (err, svg) => {
+      if (!err && svg) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(svg, "image/svg+xml");
+        const path = doc.querySelector("path");
+        if (path) setQrPath(path.getAttribute("d"));
+      }
+    });
+  }, []);
 
   useEffect(() => {
     pickerInstances.current = [];
@@ -111,7 +126,7 @@ export default function GradientComponent() {
     <div
       className="card"
       style={{
-        backgroundColor: `grey`,
+        background: gradientCSS,
         padding: "24px",
         minHeight: "100vh",
       }}
@@ -246,6 +261,49 @@ export default function GradientComponent() {
               >
                 Copy Gradient CSS
               </button>
+            </div>
+          </section>
+
+          <section className="flex justify-between items-center">
+            <div className="flex flex-col items-center justify-center space-y-2">
+              <svg
+                viewBox="0 0 256 256"
+                width={420}
+                height={420}
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <defs>
+                  <linearGradient
+                    id="qrGradient"
+                    gradientTransform={`rotate(${angle})`}
+                  >
+                    {gradientColors.map((color, i) => (
+                      <stop
+                        key={i}
+                        offset={`${(i / (gradientColors.length - 1)) * 100}%`}
+                        stopColor={color}
+                      />
+                    ))}
+                  </linearGradient>
+                </defs>
+                <rect width="100%" height="100%" fill="transparent" />
+                <path d={qrPath} fill="url(#qrGradient)" />
+              </svg>
+              <p className="text-sm text-gray-600">QR Code with gradient</p>
+            </div>
+
+            <div>
+              <h1
+  className="text-[20px] font-bold bg-clip-text text-transparent"
+  style={{
+    backgroundImage: gradientCSS,
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+  }}
+>
+  TEXT COLOR
+</h1>
+
             </div>
           </section>
 
