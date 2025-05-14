@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import QRCode from "react-qr-code";
+import ColorPickerGroup from "./ColorPickerGroup"; // adjust path as needed
+
+import GradientQRCode from "./GradientQRCode";
 
 import iro from "@jaames/iro";
 
@@ -254,27 +256,10 @@ export default function GradientComponent() {
 
           <section className="flex justify-between items-center">
             {/* QR Code with Gradient */}
-            <div
-              style={{
-                background: "#ffffff",
-                padding: "16px",
-                display: "inline-block",
-                borderRadius: "8px",
-              }}
-            >
-              <div
-                style={{
-                  background: "#ffffff",
-                  padding: "16px",
-                  borderRadius: "8px",
-                }}
-              >
-                <QRCode
-                  value={qrValue}
-                  size={200}
-                  style={{ background: gradientCSS }}
-                />
-              </div>
+            <div>
+              <div className="flex flex-col items-center gap-6">
+      <GradientQRCode text="https://example.com" colors={gradientColors} />
+    </div>
             </div>
 
             <div>
@@ -288,24 +273,23 @@ export default function GradientComponent() {
               >
                 TEXT COLOR
               </h1>
+
+              <div className="flex gap-4 text-[18px]">
+                <h1>RGB</h1>
+                <p>{`rgb(${r}, ${g}, ${b})`}</p>
+              </div>
             </div>
           </section>
 
           {/* Color Pickers + HEX Inputs */}
-          <div className="flex flex-wrap justify-between gap-4">
-            {gradientColors.map((_, index) => (
-              <div key={index} className="flex flex-col items-center gap-2">
-                <div ref={(el) => (colorPickerRefs.current[index] = el)} />
-                <input
-                  type="text"
-                  value={hexInputs[index]}
-                  onChange={(e) => handleHexInputChange(e.target.value, index)}
-                  className="border px-2 py-1 rounded w-[120px] text-center"
-                  maxLength={7}
-                />
-              </div>
-            ))}
-          </div>
+          <ColorPickerGroup
+            gradientColors={gradientColors}
+            setGradientColors={setGradientColors}
+            hexInputs={hexInputs}
+            setHexInputs={setHexInputs}
+            setColor={setColor}
+            setAlpha={setAlpha}
+          />
         </div>
       </div>
     </div>
