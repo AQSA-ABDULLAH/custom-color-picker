@@ -118,7 +118,7 @@ export default function GradientComponent() {
         <div className="w-full max-w-[600px] bg-white p-6 rounded-xl shadow-md space-y-8">
           <h3 className="text-xl font-semibold">CSS Gradient Generator</h3>
 
-          <section className="flex justify-between w-[100%]">
+          <section className="flex flex-col lg:flex-row gap-8 items-center justify-between w-[100%]">
             <div>
               {/* Gradient Type Selection */}
               <div>
@@ -247,7 +247,7 @@ export default function GradientComponent() {
             </div>
           </section>
 
-          <section className="flex justify-between items-center">
+          <section className="flex flex-col lg:flex-row gap-8 justify-between items-center">
             {/* QR Code with Gradient */}
             <div>
               <div className="flex flex-col items-center gap-6">
@@ -282,6 +282,7 @@ export default function GradientComponent() {
             setHexInputs={setHexInputs}
             setColor={setColor}
             setAlpha={setAlpha}
+            angle={angle}
           />
         </div>
       </div>

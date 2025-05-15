@@ -9,6 +9,7 @@ const ColorPickerGroup = ({
   setHexInputs,
   setColor,
   setAlpha,
+  angle
 }) => {
   const colorPickerRefs = useRef([]);
   const pickerInstances = useRef([]);
