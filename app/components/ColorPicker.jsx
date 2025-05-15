@@ -72,40 +72,48 @@ export default function ColorPickerComponent({ colorType, setColorType }) {
   }
 
   useEffect(() => {
-    if (colorPickerRef.current) {
-      const picker = new iro.ColorPicker(colorPickerRef.current, {
-        width: 200,
-        color: color,
-        borderWidth: 1,
-        borderColor: "#fff",
-        layout: [
-          { component: iro.ui.Wheel },
-          { component: iro.ui.Slider, options: { sliderType: "hue" } },
-          { component: iro.ui.Slider, options: { sliderType: "value" } },
-          { component: iro.ui.Slider, options: { sliderType: "alpha" } },
-        ],
-      });
-
-      iroPicker.current = picker;
-
-      picker.on("color:change", (newColor) => {
-        setColor(newColor.hexString);
-        setAlpha(newColor.alpha);
-      });
-
-      const sliders = colorPickerRef.current?.querySelectorAll(".IroSlider");
-      if (sliders && sliders.length >= 3) {
-        const alphaSlider = sliders[2];
-        if (alphaSlider) {
-          alphaSlider.style.background = `linear-gradient(to right, rgba(${r}, ${g}, ${b}, 0), rgba(${r}, ${g}, ${b}, 1))`;
-        }
-      }
-
-      return () => {
-        picker.off("color:change");
-      };
+  if (colorPickerRef.current) {
+    // Clean up the previous picker if already exists
+    if (iroPicker.current) {
+      iroPicker.current.off("color:change");
+      iroPicker.current = null;
+      colorPickerRef.current.innerHTML = ""; // Clear old picker DOM
     }
-  }, []);
+
+    const picker = new iro.ColorPicker(colorPickerRef.current, {
+      width: 200,
+      color: color,
+      borderWidth: 1,
+      borderColor: "#fff",
+      layout: [
+        { component: iro.ui.Wheel },
+        { component: iro.ui.Slider, options: { sliderType: "hue" } },
+        { component: iro.ui.Slider, options: { sliderType: "value" } },
+        { component: iro.ui.Slider, options: { sliderType: "alpha" } },
+      ],
+    });
+
+    iroPicker.current = picker;
+
+    picker.on("color:change", (newColor) => {
+      setColor(newColor.hexString);
+      setAlpha(newColor.alpha);
+    });
+
+    const sliders = colorPickerRef.current?.querySelectorAll(".IroSlider");
+    if (sliders && sliders.length >= 3) {
+      const alphaSlider = sliders[2];
+      if (alphaSlider) {
+        alphaSlider.style.background = `linear-gradient(to right, rgba(${r}, ${g}, ${b}, 0), rgba(${r}, ${g}, ${b}, 1))`;
+      }
+    }
+
+    return () => {
+      picker.off("color:change");
+    };
+  }
+}, []);
+
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(color);
