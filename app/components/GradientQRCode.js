@@ -20,7 +20,8 @@ const getGradientCoords = (angleDeg, size) => {
 const GradientQRCode = ({
   text = "https://example.com",
   colors = ["#ff7e5f", "#ffffff"],
-  angle, // Accepts angle in degrees like CSS
+  angle = 0,
+  gradientType = "linear",
 }) => {
   const canvasRef = useRef(null);
 
@@ -51,12 +52,33 @@ const GradientQRCode = ({
         const imageData = tempCtx.getImageData(0, 0, size, size);
         const data = imageData.data;
 
-        const { x0, y0, x1, y1 } = getGradientCoords(angle, size);
+        // Create the gradient based on type
+        let gradient;
+        if (gradientType === "linear") {
+          const { x0, y0, x1, y1 } = getGradientCoords(angle, size);
+          gradient = ctx.createLinearGradient(x0, y0, x1, y1);
+        } else if (gradientType === "radial") {
+          gradient = ctx.createRadialGradient(
+            size / 2,
+            size / 2,
+            0,
+            size / 2,
+            size / 2,
+            size / 2
+          );
+        } else if (gradientType === "conic" && ctx.createConicGradient) {
+          gradient = ctx.createConicGradient((angle * Math.PI) / 180, size / 2, size / 2);
+        } else {
+          // fallback to linear if conic not supported
+          const { x0, y0, x1, y1 } = getGradientCoords(angle, size);
+          gradient = ctx.createLinearGradient(x0, y0, x1, y1);
+        }
 
-        const gradient = ctx.createLinearGradient(x0, y0, x1, y1);
+        // Add color stops
         gradient.addColorStop(0, colors[0]);
         gradient.addColorStop(1, colors[1]);
 
+        // Apply gradient to new canvas
         const gCanvas = document.createElement("canvas");
         gCanvas.width = size;
         gCanvas.height = size;
@@ -84,7 +106,7 @@ const GradientQRCode = ({
         ctx.putImageData(newImageData, 0, 0);
       }
     );
-  }, [text, colors, angle]);
+  }, [text, colors, angle, gradientType]);
 
   return (
     <div className="flex justify-center items-center p-4 bg-white rounded-xl shadow-lg">
@@ -94,5 +116,6 @@ const GradientQRCode = ({
 };
 
 export default GradientQRCode;
+
 
 

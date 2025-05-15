@@ -258,7 +258,7 @@ export default function GradientComponent() {
             {/* QR Code with Gradient */}
             <div>
               <div className="flex flex-col items-center gap-6">
-                <GradientQRCode text={qrValue} colors={gradientColors} angle={angle} />
+                <GradientQRCode text={qrValue} colors={gradientColors} angle={angle} gradientType={gradientType} />
               </div>
             </div>
 
