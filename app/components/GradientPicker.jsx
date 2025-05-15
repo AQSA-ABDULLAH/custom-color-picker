@@ -1,8 +1,9 @@
 "use client";
-
 import { useEffect, useRef, useState } from "react";
+import ColorPickerGroup from "./ColorPickerGroup"; // adjust path as needed
+
 import GradientQRCode from "./GradientQRCode";
-import ColorPickerGroup from "./ColorPickerGroup"
+
 import iro from "@jaames/iro";
 
 const hexToRGB = (hex) => {
@@ -32,6 +33,11 @@ export default function GradientComponent() {
       : gradientType === "conic"
       ? `conic-gradient(from ${angle}deg, ${gradientColors.join(", ")})`
       : `radial-gradient(circle, ${gradientColors.join(", ")})`;
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    alert(`Copied to clipboard:\n${text}`);
+  };
 
   useEffect(() => {
     pickerInstances.current = [];
@@ -75,6 +81,7 @@ export default function GradientComponent() {
     });
   }, []);
 
+  // Sync pickers when gradientColors change
   useEffect(() => {
     gradientColors.forEach((color, index) => {
       const picker = pickerInstances.current[index];
@@ -282,7 +289,6 @@ export default function GradientComponent() {
             setHexInputs={setHexInputs}
             setColor={setColor}
             setAlpha={setAlpha}
-            angle={angle}
           />
         </div>
       </div>
