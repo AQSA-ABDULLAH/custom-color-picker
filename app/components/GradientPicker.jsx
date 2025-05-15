@@ -258,15 +258,20 @@ export default function GradientComponent() {
             {/* QR Code with Gradient */}
             <div>
               <div className="flex flex-col items-center gap-6">
-      <GradientQRCode text="https://example.com" colors={gradientColors} />
-    </div>
+                <GradientQRCode
+                  text="https://example.com"
+                  colors={gradientColors}
+                />
+              </div>
             </div>
 
             <div>
               <h1
                 className="text-[20px] font-bold bg-clip-text text-transparent"
                 style={{
-                  backgroundImage: gradientCSS,
+                  backgroundImage: `linear-gradient(90deg, ${gradientColors.join(
+                    ", "
+                  )})`,
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                 }}
