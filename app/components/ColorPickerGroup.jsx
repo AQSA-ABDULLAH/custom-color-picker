@@ -86,9 +86,9 @@ const ColorPickerGroup = ({
   };
 
   return (
-    <div className="flex flex-wrap justify-between gap-4">
+    <div className=" flex flex-wrap justify-between items-center gap-4">
       {gradientColors.map((_, index) => (
-        <div key={index} className="flex flex-col items-center gap-2">
+        <div key={index} className="flex flex-col items-center gap-2 w-full">
           <div ref={(el) => (colorPickerRefs.current[index] = el)} />
           <input
             type="text"
