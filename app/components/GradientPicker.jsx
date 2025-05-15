@@ -129,6 +129,7 @@ export default function GradientComponent({ colorType, setColorType }) {
           <select
             value={colorType}
             onChange={(e) => setColorType(e.target.value)}
+            className="border-1 border-black"
           >
             <option value="solid">Solid Color</option>
             <option value="gradient">Gradient</option>
