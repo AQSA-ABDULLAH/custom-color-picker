@@ -3,7 +3,7 @@ import QRCode from "qrcode";
 
 // Internally handles deg → coord without exposing radians
 const getGradientCoords = (angleDeg, size) => {
-  const a = ((angleDeg - 90) + 360) % 360;
+  const a = ((angleDeg - 90) + 360);
   const angle = (a * Math.PI) / 180;
   const x = Math.cos(angle);
   const y = Math.sin(angle);
