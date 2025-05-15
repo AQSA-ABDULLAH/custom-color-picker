@@ -1,9 +1,8 @@
 "use client";
+
 import { useEffect, useRef, useState } from "react";
-import ColorPickerGroup from "./ColorPickerGroup"; // adjust path as needed
-
 import GradientQRCode from "./GradientQRCode";
-
+import ColorPickerGroup from "./ColorPickerGroup"
 import iro from "@jaames/iro";
 
 const hexToRGB = (hex) => {
@@ -33,11 +32,6 @@ export default function GradientComponent() {
       : gradientType === "conic"
       ? `conic-gradient(from ${angle}deg, ${gradientColors.join(", ")})`
       : `radial-gradient(circle, ${gradientColors.join(", ")})`;
-
-  const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text);
-    alert(`Copied to clipboard:\n${text}`);
-  };
 
   useEffect(() => {
     pickerInstances.current = [];
@@ -81,7 +75,6 @@ export default function GradientComponent() {
     });
   }, []);
 
-  // Sync pickers when gradientColors change
   useEffect(() => {
     gradientColors.forEach((color, index) => {
       const picker = pickerInstances.current[index];
@@ -258,10 +251,7 @@ export default function GradientComponent() {
             {/* QR Code with Gradient */}
             <div>
               <div className="flex flex-col items-center gap-6">
-                <GradientQRCode
-                  text="https://example.com"
-                  colors={gradientColors}
-                />
+                <GradientQRCode text={qrValue} colors={gradientColors} angle={angle} />
               </div>
             </div>
 
@@ -269,9 +259,7 @@ export default function GradientComponent() {
               <h1
                 className="text-[20px] font-bold bg-clip-text text-transparent"
                 style={{
-                  backgroundImage: `linear-gradient(90deg, ${gradientColors.join(
-                    ", "
-                  )})`,
+                  backgroundImage: gradientCSS,
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                 }}

@@ -1,7 +1,8 @@
+// GradientQRCode.js
 import React, { useEffect, useRef } from "react";
 import QRCode from "qrcode";
 
-const GradientQRCode = ({ text = "https://example.com", colors = ["#ff7e5f", "#ffffff"] }) => {
+const GradientQRCode = ({ text = "https://example.com", colors = ["#ff7e5f", "#ffffff"], angle = 0 }) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -27,7 +28,13 @@ const GradientQRCode = ({ text = "https://example.com", colors = ["#ff7e5f", "#f
       const imageData = tempCtx.getImageData(0, 0, size, size);
       const data = imageData.data;
 
-      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      const radians = (angle * Math.PI) / 540;
+      const x1 = size / 2 + Math.cos(radians) * size;
+      const y1 = size / 2 + Math.sin(radians) * size;
+      const x0 = size / 2 - Math.cos(radians) * size;
+      const y0 = size / 2 - Math.sin(radians) * size;
+
+      const gradient = ctx.createLinearGradient(x0, y0, x1, y1);
       gradient.addColorStop(0, colors[0]);
       gradient.addColorStop(1, colors[1]);
 
@@ -57,7 +64,7 @@ const GradientQRCode = ({ text = "https://example.com", colors = ["#ff7e5f", "#f
 
       ctx.putImageData(newImageData, 0, 0);
     });
-  }, [text, colors]);
+  }, [text, colors, angle]);
 
   return (
     <div className="flex justify-center items-center p-4 bg-white rounded-xl shadow-lg">
