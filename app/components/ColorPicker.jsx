@@ -38,7 +38,7 @@ const hexToHSV = (hex) => {
   return [h, Math.round(s * 100), Math.round(v * 100)];
 };
 
-export default function ColorPickerComponent() {
+export default function ColorPickerComponent({ colorType, setColorType }) {
   const [hue, setHue] = useState(0);
   const [alpha, setAlpha] = useState(1);
   const [color, setColor] = useState("#ff0000");
@@ -124,6 +124,17 @@ export default function ColorPickerComponent() {
     >
       <div className="flex flex-col items-center justify-center min-h-screen">
         <div className="w-full max-w-[500px] bg-[#ffff] p-6 rounded-xl shadow-md space-y-6">
+          <label htmlFor="colorType" className="block mb-2 font-semibold">
+            Select Color Type:
+          </label>
+          <select
+  value={colorType}
+  onChange={(e) => setColorType(e.target.value)}
+>
+  <option value="solid">Solid Color</option>
+  <option value="gradient">Gradient</option>
+</select>
+
           <div className="text-center space-y-1">
             <h2 className="text-3xl font-bold">Color Picker</h2>
             <p>Hue wheel + Opacity bar</p>
@@ -186,33 +197,49 @@ export default function ColorPickerComponent() {
           </div>
 
           <div className="flex items-center justify-between gap-10 w-full">
-            {[{ label: "r", value: r }, { label: "g", value: g }, { label: "b", value: b }].map((item, i) => (
+            {[
+              { label: "r", value: r },
+              { label: "g", value: g },
+              { label: "b", value: b },
+            ].map((item, i) => (
               <div key={i} className="flex gap-3 items-center">
                 <label className="text-gray-600 capitalize">{item.label}</label>
-                <div className="w-[80px] border px-2 py-1 text-center rounded">{item.value}</div>
+                <div className="w-[80px] border px-2 py-1 text-center rounded">
+                  {item.value}
+                </div>
               </div>
             ))}
           </div>
 
           <div className="flex items-center justify-between gap-10 w-full">
-            {[{ label: "h", value: h }, { label: "s", value: s }, { label: "v", value: v }].map((item, i) => (
+            {[
+              { label: "h", value: h },
+              { label: "s", value: s },
+              { label: "v", value: v },
+            ].map((item, i) => (
               <div key={i} className="flex gap-3 items-center">
                 <label className="text-gray-600 capitalize">{item.label}</label>
-                <div className="w-[80px] border px-2 py-1 text-center rounded">{item.value}</div>
+                <div className="w-[80px] border px-2 py-1 text-center rounded">
+                  {item.value}
+                </div>
               </div>
             ))}
           </div>
 
           <div className="space-y-4 text-sm w-full">
             <div className="flex justify-between items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-md shadow">
-              <span className="font-semibold text-gray-800 dark:text-white">HSLA</span>
+              <span className="font-semibold text-gray-800 dark:text-white">
+                HSLA
+              </span>
               <code className="text-xs px-2 py-1 bg-white dark:bg-gray-800 text-blue-700 dark:text-blue-300 rounded">
                 {hsla}
               </code>
             </div>
 
             <div className="flex justify-between items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-md shadow">
-              <span className="font-semibold text-gray-800 dark:text-white">OKLCH</span>
+              <span className="font-semibold text-gray-800 dark:text-white">
+                OKLCH
+              </span>
               <code className="text-xs px-2 py-1 bg-white dark:bg-gray-800 text-green-700 dark:text-green-300 rounded">
                 {oklchString}
               </code>

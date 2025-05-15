@@ -13,7 +13,7 @@ const hexToRGB = (hex) => {
   return [r, g, b];
 };
 
-export default function GradientComponent() {
+export default function GradientComponent({ colorType, setColorType }) {
   const [gradientColors, setGradientColors] = useState(["#ff0000", "#0000ff"]);
   const [hexInputs, setHexInputs] = useState(["#ff0000", "#0000ff"]);
   const [gradientType, setGradientType] = useState("linear");
@@ -123,6 +123,17 @@ export default function GradientComponent() {
     >
       <div className="flex flex-col items-center justify-center min-h-screen">
         <div className="w-full max-w-[600px] bg-white p-6 rounded-xl shadow-md space-y-8">
+          <label htmlFor="colorType" className="block mb-2 font-semibold">
+            Select Color Type:
+          </label>
+          <select
+            value={colorType}
+            onChange={(e) => setColorType(e.target.value)}
+          >
+            <option value="solid">Solid Color</option>
+            <option value="gradient">Gradient</option>
+          </select>
+
           <h3 className="text-xl font-semibold">CSS Gradient Generator</h3>
 
           <section className="flex flex-col lg:flex-row gap-8 items-center justify-between w-[100%]">
@@ -258,7 +269,12 @@ export default function GradientComponent() {
             {/* QR Code with Gradient */}
             <div>
               <div className="flex flex-col items-center gap-6">
-                <GradientQRCode text={qrValue} colors={gradientColors} angle={angle} gradientType={gradientType} />
+                <GradientQRCode
+                  text={qrValue}
+                  colors={gradientColors}
+                  angle={angle}
+                  gradientType={gradientType}
+                />
               </div>
             </div>
 
