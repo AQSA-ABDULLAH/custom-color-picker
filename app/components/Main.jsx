@@ -5,30 +5,31 @@ import GradientComponent from "./GradientPicker";
 
 function Main() {
   const [colorType, setColorType] = useState("solid");
-  const [solidColor, setSolidColor] = useState("#ff0000"); // NEW
+  const [solidColor, setSolidColor] = useState("#ff0000");
 
   return (
-    <div>
-      {colorType === "solid" && (
-        <ColorPickerComponent
-          colorType={colorType}
-          setColorType={setColorType}
-          solidColor={solidColor}
-          setSolidColor={setSolidColor} // NEW
-        />
-      )}
+    <div className="p-4 space-y-4">
 
-      {colorType === "gradient" && (
-        <GradientComponent
-          colorType={colorType}
-          setColorType={setColorType}
-          initialGradientColors={[solidColor, "#ffffff"]} // NEW
-        />
-      )}
+      {/* Color Picker / Gradient Picker */}
+      <div>
+        {colorType === "solid" ? (
+          <ColorPickerComponent
+            colorType={colorType}
+            setColorType={setColorType}
+            solidColor={solidColor}
+            setSolidColor={setSolidColor}
+          />
+        ) : (
+          <GradientComponent
+            colorType={colorType}
+            setColorType={setColorType}
+            initialGradientColors={[solidColor, "#ffffff"]}
+          />
+        )}
+      </div>
     </div>
   );
 }
 
 export default Main;
-
 
