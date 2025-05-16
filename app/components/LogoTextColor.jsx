@@ -1,13 +1,47 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import iro from "@jaames/iro";
 
 function LogoTextColor() {
   const [logoFile, setLogoFile] = useState(null);
   const [svgContent, setSvgContent] = useState("");
-  const [colorType, setColorType] = useState("solid");
   const [solidColor, setSolidColor] = useState("#ff0000");
-  const [backgroundColor, setBackgroundColor] = useState("#ffffff"); // ✅ Added background color
   const [bio, setBio] = useState("");
+
+  const colorPickerRef = useRef(null);
+  const pickerInstance = useRef(null);
+
+  // Logo/Text color picker
+  useEffect(() => {
+    if (colorPickerRef.current && !pickerInstance.current) {
+      pickerInstance.current = new iro.ColorPicker(colorPickerRef.current, {
+        width: 160,
+        color: solidColor,
+        borderWidth: 1,
+        borderColor: "#fff",
+        layout: [
+          { component: iro.ui.Wheel },
+          { component: iro.ui.Slider, options: { sliderType: "hue" } },
+          { component: iro.ui.Slider, options: { sliderType: "value" } },
+          { component: iro.ui.Slider, options: { sliderType: "alpha" } },
+        ],
+      });
+
+      pickerInstance.current.on("color:change", (newColor) => {
+        setSolidColor(newColor.hexString);
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (
+      pickerInstance.current &&
+      pickerInstance.current.color.hexString.toLowerCase() !==
+        solidColor.toLowerCase()
+    ) {
+      pickerInstance.current.color.hexString = solidColor;
+    }
+  }, [solidColor]);
 
   const handleLogoUpload = (e) => {
     const file = e.target.files?.[0];
@@ -26,82 +60,84 @@ function LogoTextColor() {
   const renderSvgWithColor = () => {
     if (!svgContent) return null;
 
-    let coloredSvg = svgContent;
-
-    if (colorType === "solid") {
-      // Remove all inline fill attributes
-      coloredSvg = coloredSvg.replace(/fill="[^"]*"/g, "");
-
-      // Inject a <style> into the <svg> to apply the fill color to all child elements
-      coloredSvg = coloredSvg.replace(
-        /<svg([^>]*)>/,
-        `<svg$1><style>* { fill: ${solidColor} !important; }</style>`
-      );
-    }
+    let coloredSvg = svgContent.replace(/fill="[^"]*"/g, "");
+    coloredSvg = coloredSvg.replace(
+      /<svg([^>]*)>/,
+      `<svg$1><style>* { fill: ${solidColor} !important; }</style>`
+    );
 
     return (
       <div
-      className="p-10"
-      style={{ backgroundColor }}
-      dangerouslySetInnerHTML={{ __html: coloredSvg }} // ✅ fixed typo here
-    />
+        className="p-4 w-[320px]"
+        style={{ backgroundColor: "#ffffff" }}
+        dangerouslySetInnerHTML={{ __html: coloredSvg }}
+      />
     );
   };
 
   return (
-    <div className="px-60 py-5 space-y-4">
-      {/* Upload Logo */}
-      <div>
-        <label className="block font-medium mb-1">
-          Upload Logo (SVG Only):
-        </label>
-        <input type="file" accept=".svg" onChange={handleLogoUpload} />
-        {logoFile && (
-          <div className="mt-4">
-            <p className="text-sm mb-1">Preview:</p>
-            {renderSvgWithColor()}
-          </div>
-        )}
-      </div>
+    <div
+      className="card"
+      style={{
+        backgroundColor: solidColor, // ← just use the variable directly
+        padding: "24px",
+        Height: "100vh",
+      }}
+    >
+      <div className=" flex justify-center">
+        <div className="w-[50rem] bg-white px-6 py-[17px] shadow rounded space-y-8">
+          <section className="flex items-start justify-between">
+            {/* Upload Logo */}
+            <div>
+              <div className="flex items-center gap-3">
+                <h3 className="font-semibold">Upload Logo:</h3>
+                <label className="flex items-center justify-center mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700 transition duration-300 w-fit">
+                  Upload SVG
+                  <input
+                    type="file"
+                    accept=".svg"
+                    onChange={handleLogoUpload}
+                    className="hidden"
+                  />
+                </label>
+              </div>
 
-      {/* Text/Logo Color Picker */}
-      <div className="flex items-center gap-2">
-        <label className="font-medium">Logo and Text Color:</label>
-        <input
-          type="color"
-          value={solidColor}
-          onChange={(e) => setSolidColor(e.target.value)}
-        />
-      </div>
+              {logoFile && (
+                <div className="mt-4">
+                  <p className="text-lg mb-1 font-semibold">Preview:</p>
+                  {renderSvgWithColor()}
+                </div>
+              )}
+            </div>
 
-      {/* Background Color Picker */}
-      <div className="flex items-center gap-2">
-        <label className="font-medium">Background Color:</label>
-        <input
-          type="color"
-          value={backgroundColor}
-          onChange={(e) => setBackgroundColor(e.target.value)}
-        />
-      </div>
+            {/* Bio Input with Applied Color */}
+            <div>
+              <label className="block font-medium mb-1">Your Bio:</label>
+              <textarea
+                rows={4}
+                className="w-[320px] p-2 border rounded text-[15px] font-bold"
+                placeholder="Write a short bio here..."
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                style={{
+                  color: solidColor,
+                  backgroundColor: "#ffffff",
+                }}
+              />
+            </div>
+          </section>
 
-      {/* Bio Input with Applied Color */}
-      <div>
-        <label className="block font-medium mb-1">Your Bio:</label>
-        <textarea
-          rows={4}
-          className="w-full p-2 border rounded text-[15px] font-bold"
-          placeholder="Write a short bio here..."
-          value={bio}
-          onChange={(e) => setBio(e.target.value)}
-          style={{
-            color: solidColor,
-            backgroundColor: backgroundColor, // ✅ Apply background here too
-          }}
-        />
+          <section className="flex justify-start">
+            {/* Logo & Text Color Picker */}
+            <div>
+              <label className="font-medium">Logo & Text Color:</label>
+              <div ref={colorPickerRef} className="mt-2" />
+            </div>
+          </section>
+        </div>
       </div>
     </div>
   );
 }
 
 export default LogoTextColor;
-
