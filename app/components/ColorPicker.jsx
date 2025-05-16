@@ -38,10 +38,11 @@ const hexToHSV = (hex) => {
   return [h, Math.round(s * 100), Math.round(v * 100)];
 };
 
-export default function ColorPickerComponent({ colorType, setColorType }) {
+export default function ColorPickerComponent({ colorType, setColorType, solidColor,
+  setSolidColor, }) {
   const [hue, setHue] = useState(0);
   const [alpha, setAlpha] = useState(1);
-  const [color, setColor] = useState("#ff0000");
+  const [color, setColor] = useState(solidColor || "#ff0000");
 
   const colorPickerRef = useRef(null);
   const iroPicker = useRef(null);
@@ -113,6 +114,10 @@ export default function ColorPickerComponent({ colorType, setColorType }) {
       };
     }
   }, []);
+
+  useEffect(() => {
+    setSolidColor(color); // Keep solidColor in sync
+  }, [color]);
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(color);

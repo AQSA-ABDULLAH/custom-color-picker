@@ -13,9 +13,9 @@ const hexToRGB = (hex) => {
   return [r, g, b];
 };
 
-export default function GradientComponent({ colorType, setColorType }) {
-  const [gradientColors, setGradientColors] = useState(["#ff0000", "#0000ff"]);
-  const [hexInputs, setHexInputs] = useState(["#ff0000", "#0000ff"]);
+export default function GradientComponent({ colorType, setColorType, initialGradientColors = ["#ff0000", "#ffffff"], }) {
+  const [gradientColors, setGradientColors] = useState(initialGradientColors);
+  const [hexInputs, setHexInputs] = useState(initialGradientColors);
   const [gradientType, setGradientType] = useState("linear");
   const [angle, setAngle] = useState(90);
   const [qrValue, setQrValue] = useState("https://example.com");
