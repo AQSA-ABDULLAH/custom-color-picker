@@ -47,75 +47,47 @@ export default function GradientComponent({
     }
   };
 
-
-
-
-
-
   const renderSvgWithGradient = () => {
-  if (!svgContent) return null;
+    if (!svgContent) return null;
 
-  const gradientId = "customGradient";
+    const gradientId = "gradientFill";
 
-  // Example gradient stops — customize these or generate them dynamically
-  const gradientStops = `
-    <stop offset="0%" stop-color="#ff0000" />
-    <stop offset="100%" stop-color="#0000ff" />
-  `;
+    const gradientStops = gradientColors
+      .map(
+        (color, index) =>
+          `<stop offset="${
+            (index / (gradientColors.length - 1)) * 100
+          }%" stop-color="${color}" />`
+      )
+      .join("");
 
-  let gradientDef = "";
-
-  if (gradientType === "linear") {
-    const angleRad = (angle * Math.PI) / 180;
-    const x1 = 50 - Math.cos(angleRad) * 50;
-    const y1 = 50 - Math.sin(angleRad) * 50;
-    const x2 = 50 + Math.cos(angleRad) * 50;
-    const y2 = 50 + Math.sin(angleRad) * 50;
-
-    gradientDef = `
-    <defs>
-      <linearGradient id="${gradientId}" gradientUnits="userSpaceOnUse" x1="${x1}%" y1="${y1}%" x2="${x2}%" y2="${y2}%">
-        ${gradientStops}
-      </linearGradient>
-    </defs>`;
-  } else if (gradientType === "radial") {
-    gradientDef = `
-    <defs>
-      <radialGradient id="${gradientId}" cx="50%" cy="50%" r="50%">
-        ${gradientStops}
-      </radialGradient>
-    </defs>`;
-  } else if (gradientType === "conic") {
-    gradientDef = `
+    // Define a horizontal gradient as default
+    const gradientDef = `
     <defs>
       <linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="0%">
         ${gradientStops}
       </linearGradient>
-    </defs>`;
-  }
+    </defs>
+  `;
 
-  let modifiedSvg = svgContent
-    .replace(/<style[^>]*>.*?<\/style>/gs, "")
-    .replace(/fill="[^"]*"/g, "")
-    .replace(/<svg([^>]*)>/, `<svg$1>${gradientDef}`)
-    .replace(
-      /<(path|rect|circle|polygon|ellipse|g)(\s|>)/g,
-      `<$1 fill="url(#${gradientId})"$2`
+    // Clean SVG: remove inline fills & styles
+    let modifiedSvg = svgContent
+      .replace(/<style[^>]*>.*?<\/style>/gs, "") // remove <style> blocks
+      .replace(/fill="[^"]*"/g, "") // remove inline fill
+      .replace(/<svg([^>]*)>/, `<svg$1>${gradientDef}`)
+      .replace(
+        /<(path|rect|circle|polygon|ellipse|g)(\s|>)/g,
+        `<$1 fill="url(#${gradientId})"$2`
+      );
+
+    return (
+      <div
+        className="p-4 w-[320px]"
+        style={{ backgroundColor: "#ffffff" }}
+        dangerouslySetInnerHTML={{ __html: modifiedSvg }}
+      />
     );
-
-  return (
-    <div
-      className="p-4 w-[320px]"
-      style={{ backgroundColor: "#ffffff" }}
-      dangerouslySetInnerHTML={{ __html: modifiedSvg }}
-    />
-  );
-};
-
-
-
-
-
+  };
 
   return (
     <div
