@@ -92,8 +92,6 @@ export default function GradientComponent({
       </defs>
     `;
     } else if (gradientType === "conic") {
-      // Conic is not natively supported in SVG; simulate using pattern or fallback to radial
-      // Example fallback:
       gradientDef = `
       <defs>
         <radialGradient id="${gradientId}" cx="50%" cy="50%" r="50%">
@@ -108,7 +106,14 @@ export default function GradientComponent({
       .replace(/<style[^>]*>.*?<\/style>/gs, "")
       .replace(/fill="[^"]*"/g, "")
       .replace(/stroke="[^"]*"/g, "")
-      .replace(/<svg([^>]*)>/, `<svg$1>${gradientDef}`)
+      .replace(/<svg([^>]*)>/, (match, p1) => {
+        if (gradientType === "conic") {
+          return `<svg${p1}>${gradientDef}`;
+        } else {
+          return `<svg${p1}><defs>${gradientDef}</defs>`;
+        }
+      })
+
       .replace(
         /<(path|rect|circle|polygon|ellipse|g)(\s|>)/g,
         `<$1 fill="url(#${gradientId})"$2`
@@ -133,7 +138,7 @@ export default function GradientComponent({
     >
       <div className="flex flex-col items-center justify-center min-h-screen">
         <div className="w-full max-w-[800px] bg-white p-6 rounded-xl shadow-md space-y-8">
-             <label htmlFor="colorType" className="block mb-2 font-semibold">
+          <label htmlFor="colorType" className="block mb-2 font-semibold">
             Select Color Type:
           </label>
           <select
@@ -150,7 +155,7 @@ export default function GradientComponent({
             <div>
               <label className="block font-medium mb-2">Style</label>
               <div className="flex gap-2">
-                {["linear", "radial", "conic"].map((type) => (
+                {["linear", "radial"].map((type) => (
                   <button
                     key={type}
                     onClick={() => setGradientType(type)}
