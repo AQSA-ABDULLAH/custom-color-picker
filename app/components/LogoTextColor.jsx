@@ -138,7 +138,7 @@ function LogoTextColor({ colorType, setColorType, solidColor, setSolidColor }) {
       className="card"
       style={{ backgroundColor: solidColor, padding: "24px", minHeight: "100vh" }}
     >
-      <div className="flex justify-center">
+      <div className="flex items-center justify-center min-h-screen">
         <div className="w-[50rem] bg-white px-6 py-6 shadow rounded space-y-8">
           <label htmlFor="colorType" className="block mb-2 font-semibold">
             Select Color Type:
