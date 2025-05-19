@@ -1,13 +1,13 @@
 import React from "react";
 // import Main from "./components/Main"
-import LogoTextColor from "./components/LogoTextColor"
+import GradientComponent from "./components/LogoTextGradientColor"
 
 function page() {
   return (
     <div>
       <h1></h1>
       {/* <Main /> */}
-      <LogoTextColor />
+      <GradientComponent />
     </div>
   );
 }

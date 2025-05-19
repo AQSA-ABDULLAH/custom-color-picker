@@ -84,7 +84,7 @@ function LogoTextColor() {
         Height: "100vh",
       }}
     >
-      <div className=" flex justify-center">
+      <div className=" flex justify-center h-[screen]">
         <div className="w-[50rem] bg-white px-6 py-[17px] shadow rounded space-y-8">
           <section className="flex items-start justify-between">
             {/* Upload Logo */}
