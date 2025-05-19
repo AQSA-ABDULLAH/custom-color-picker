@@ -133,6 +133,17 @@ export default function GradientComponent({
     >
       <div className="flex flex-col items-center justify-center min-h-screen">
         <div className="w-full max-w-[800px] bg-white p-6 rounded-xl shadow-md space-y-8">
+             <label htmlFor="colorType" className="block mb-2 font-semibold">
+            Select Color Type:
+          </label>
+          <select
+            value={colorType}
+            onChange={(e) => setColorType(e.target.value)}
+            className="border-1 border-black"
+          >
+            <option value="solid">Solid Color</option>
+            <option value="gradient">Gradient</option>
+          </select>
           <h3 className="text-xl font-semibold">CSS Gradient Generator</h3>
 
           <section className="flex flex-col lg:flex-row gap-8 items-center justify-between w-[100%]">

@@ -2,10 +2,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import iro from "@jaames/iro";
 
-function LogoTextColor() {
+function LogoTextColor({ colorType, setColorType, solidColor, setSolidColor }) {
+
   const [logoFile, setLogoFile] = useState(null);
   const [svgContent, setSvgContent] = useState("");
-  const [solidColor, setSolidColor] = useState("#ff0000");
   const [bio, setBio] = useState("");
 
   const colorPickerRef = useRef(null);
@@ -86,6 +86,18 @@ function LogoTextColor() {
     >
       <div className=" flex justify-center h-[screen]">
         <div className="w-[50rem] bg-white px-6 py-[17px] shadow rounded space-y-8">
+          <label htmlFor="colorType" className="block mb-2 font-semibold">
+            Select Color Type:
+          </label>
+          <select
+            value={colorType}
+            onChange={(e) => setColorType(e.target.value)}
+            className="border-1 border-black"
+          >
+            <option value="solid">Solid Color</option>
+            <option value="gradient">Gradient</option>
+          </select>
+
           <section className="flex items-start justify-between">
             {/* Upload Logo */}
             <div>
