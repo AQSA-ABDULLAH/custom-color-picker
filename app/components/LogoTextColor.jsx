@@ -177,7 +177,7 @@ function LogoTextColor({ colorType, setColorType, solidColor, setSolidColor }) {
       className="card"
       style={{
     backgroundColor:
-      colorTarget === "background" || colorTarget === "all" ? solidColor : "#ffffff",
+      colorTarget === "background" || colorTarget === "all" ? solidColor : "#e3dade",
     padding: "24px",
     minHeight: "100vh"
   }}
