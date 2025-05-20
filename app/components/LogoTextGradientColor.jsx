@@ -9,10 +9,9 @@ const hexToRGB = (hex) => {
   return [r, g, b];
 };
 
-
 const hexToCMYK = (hex) => {
   // Remove # if present
-  hex = hex.replace(/^#/, '');
+  hex = hex.replace(/^#/, "");
 
   // Convert HEX to RGB
   const r = parseInt(hex.substring(0, 2), 16) / 255;
@@ -35,13 +34,12 @@ const hexToCMYK = (hex) => {
     parseFloat(c.toFixed(4)),
     parseFloat(m.toFixed(4)),
     parseFloat(y.toFixed(4)),
-    parseFloat(k.toFixed(4))
+    parseFloat(k.toFixed(4)),
   ];
 };
 
 // Example
 console.log(hexToCMYK("#ff9900")); // Output: [0, 0.4, 1, 0]
-
 
 export default function GradientComponent({
   colorType,
@@ -51,6 +49,7 @@ export default function GradientComponent({
   const [gradientColors, setGradientColors] = useState(initialGradientColors);
   const [hexInputs, setHexInputs] = useState(initialGradientColors);
   const [gradientType, setGradientType] = useState("linear");
+  const [colorTarget, setColorTarget] = useState("all"); // "logo", "text", "background", "all"
   const [angle, setAngle] = useState(90);
   // const [gradientAngle, setGradientAngle] = useState(90);
 
@@ -62,7 +61,7 @@ export default function GradientComponent({
   const [bio, setBio] = useState("");
 
   const [r, g, b] = hexToRGB(color);
-const [c, m, y, k] = hexToCMYK(color);
+  const [c, m, y, k] = hexToCMYK(color);
 
   const gradientCSS =
     gradientType === "linear"
@@ -175,17 +174,41 @@ const [c, m, y, k] = hexToCMYK(color);
     >
       <div className="flex flex-col items-center justify-center min-h-screen">
         <div className="w-full max-w-[800px] bg-white p-6 rounded-xl shadow-md space-y-8">
-          <label htmlFor="colorType" className="block mb-2 font-semibold">
-            Select Color Type:
-          </label>
-          <select
-            value={colorType}
-            onChange={(e) => setColorType(e.target.value)}
-            className="border-1 border-black"
-          >
-            <option value="solid">Solid Color</option>
-            <option value="gradient">Gradient</option>
-          </select>
+          <section className="flex  justify-between items-center">
+            <div>
+              <label htmlFor="colorType" className="block mb-2 font-semibold">
+                Select Color Type:
+              </label>
+              <select
+                value={colorType}
+                onChange={(e) => setColorType(e.target.value)}
+                className="border-1 border-black"
+              >
+                <option value="solid">Solid Color</option>
+                <option value="gradient">Gradient</option>
+              </select>
+            </div>
+
+            <div>
+              <label
+                htmlFor="colorTarget"
+                className="block mt-4 mb-2 font-semibold"
+              >
+                Select Color Target:
+              </label>
+              <select
+                value={colorTarget}
+                onChange={(e) => setColorTarget(e.target.value)}
+                className="border border-black px-2 py-1 rounded"
+              >
+                <option value="logo">Logo</option>
+                <option value="text">Text</option>
+                <option value="background">Background</option>
+                <option value="all">All</option>
+              </select>
+            </div>
+          </section>
+
           <h3 className="text-xl font-semibold">CSS Gradient Generator</h3>
 
           <section className="flex flex-col lg:flex-row gap-8 items-center justify-between w-[100%]">
@@ -342,30 +365,39 @@ const [c, m, y, k] = hexToCMYK(color);
                 placeholder="Write a short bio here..."
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
-                style={{
-                  backgroundColor: "#ffffff",
-                  backgroundImage: gradientCSS,
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                }}
+                style={
+                  colorTarget === "text" || colorTarget === "all"
+                    ? {
+                        backgroundColor: "#ffffff",
+                        backgroundImage: gradientCSS,
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                      }
+                    : {
+                        backgroundColor: "#ffffff",
+                        backgroundImage: "#000",
+                        WebkitBackgroundClip: "text",
+                      }
+                }
               />
             </div>
           </section>
 
           <div className="flex justify-between items-center px-4 py-2 bg-gray-100 rounded-md shadow">
-              <span className="font-semibold text-gray-800">RGB</span>
-              <code className="text-xs px-2 py-1 bg-white text-green-700 rounded"><p>{`rgb(${r}, ${g}, ${b})`}</p></code>
-            </div>
+            <span className="font-semibold text-gray-800">RGB</span>
+            <code className="text-xs px-2 py-1 bg-white text-green-700 rounded">
+              <p>{`rgb(${r}, ${g}, ${b})`}</p>
+            </code>
+          </div>
 
-
-            <div className="flex justify-between items-center px-4 py-2 bg-gray-100 rounded-md shadow mt-2">
-  <span className="font-semibold text-gray-800">CMYK</span>
-  <code className="text-xs px-2 py-1 bg-white text-blue-700 rounded">
-    <p>{`cmyk(${(c * 100).toFixed(0)}%, ${(m * 100).toFixed(0)}%, ${(y * 100).toFixed(0)}%, ${(k * 100).toFixed(0)}%)`}</p>
-  </code>
-</div>
-
-
+          <div className="flex justify-between items-center px-4 py-2 bg-gray-100 rounded-md shadow mt-2">
+            <span className="font-semibold text-gray-800">CMYK</span>
+            <code className="text-xs px-2 py-1 bg-white text-blue-700 rounded">
+              <p>{`cmyk(${(c * 100).toFixed(0)}%, ${(m * 100).toFixed(0)}%, ${(
+                y * 100
+              ).toFixed(0)}%, ${(k * 100).toFixed(0)}%)`}</p>
+            </code>
+          </div>
         </div>
       </div>
     </div>

@@ -138,34 +138,33 @@ function LogoTextColor({ colorType, setColorType, solidColor, setSolidColor }) {
   };
 
   const renderSvgWithColor = () => {
-  if (!svgContent) return null;
+    if (!svgContent) return null;
 
-  // Remove existing fill attributes
-  let coloredSvg = svgContent.replace(/fill="[^"]*"/g, "");
+    // Remove existing fill attributes
+    let coloredSvg = svgContent.replace(/fill="[^"]*"/g, "");
 
-  // Determine if logo color should be changed
-  if (colorTarget === "logo" || colorTarget === "all") {
-    coloredSvg = coloredSvg.replace(
-      /<svg([^>]*)>/,
-      `<svg$1><style>* { fill: ${color} !important; }</style>`
+    // Determine if logo color should be changed
+    if (colorTarget === "logo" || colorTarget === "all") {
+      coloredSvg = coloredSvg.replace(
+        /<svg([^>]*)>/,
+        `<svg$1><style>* { fill: ${color} !important; }</style>`
+      );
+    } else {
+      // If logo is not selected, keep original color or remove colorization
+      coloredSvg = coloredSvg.replace(
+        /<svg([^>]*)>/,
+        `<svg$1><style>* { fill: inherit; }</style>`
+      );
+    }
+
+    return (
+      <div
+        className="p-4 w-[320px]"
+        style={{ backgroundColor: "#ffffff" }}
+        dangerouslySetInnerHTML={{ __html: coloredSvg }}
+      />
     );
-  } else {
-    // If logo is not selected, keep original color or remove colorization
-    coloredSvg = coloredSvg.replace(
-      /<svg([^>]*)>/,
-      `<svg$1><style>* { fill: inherit; }</style>`
-    );
-  }
-
-  return (
-    <div
-      className="p-4 w-[320px]"
-      style={{ backgroundColor: "#ffffff" }}
-      dangerouslySetInnerHTML={{ __html: coloredSvg }}
-    />
-  );
-};
-
+  };
 
   const [r, g, b] = hexToRGB(color);
   const [h, s, v] = hexToHSV(color);
@@ -176,11 +175,13 @@ function LogoTextColor({ colorType, setColorType, solidColor, setSolidColor }) {
     <div
       className="card"
       style={{
-    backgroundColor:
-      colorTarget === "background" || colorTarget === "all" ? solidColor : "#e3dade",
-    padding: "24px",
-    minHeight: "100vh"
-  }}
+        backgroundColor:
+          colorTarget === "background" || colorTarget === "all"
+            ? solidColor
+            : "#e3dade",
+        padding: "24px",
+        minHeight: "100vh",
+      }}
     >
       <div className="flex items-center justify-center min-h-screen">
         <div className="w-[50rem] bg-white px-6 py-6 shadow rounded space-y-8">
@@ -249,9 +250,12 @@ function LogoTextColor({ colorType, setColorType, solidColor, setSolidColor }) {
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 style={{
-  color: colorTarget === "text" || colorTarget === "all" ? color : "#000",
-  backgroundColor: "#ffffff"
-}}
+                  color:
+                    colorTarget === "text" || colorTarget === "all"
+                      ? color
+                      : "#000",
+                  backgroundColor: "#ffffff",
+                }}
               />
             </div>
           </section>
