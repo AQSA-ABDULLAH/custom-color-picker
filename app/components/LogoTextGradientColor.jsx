@@ -85,92 +85,105 @@ export default function GradientComponent({
   };
 
   const renderSvgWithGradient = () => {
-    if (!svgContent) return null;
+  if (!svgContent) return null;
 
-    const gradientId = "gradientFill";
+  const gradientId = "gradientFill";
 
-    // Generate gradient stops
-    const gradientStops = gradientColors
-      .map(
-        (color, index) =>
-          `<stop offset="${
-            (index / (gradientColors.length - 1)) * 100
-          }%" stop-color="${color}" />`
-      )
-      .join("");
+  // Generate gradient stops
+  const gradientStops = gradientColors
+    .map(
+      (color, index) =>
+        `<stop offset="${
+          (index / (gradientColors.length - 1)) * 100
+        }%" stop-color="${color}" />`
+    )
+    .join("");
 
-    // Gradient direction logic
-    let gradientDef = "";
+  // Gradient direction logic
+  let gradientDef = "";
 
-    if (gradientType === "linear") {
-      // Convert angle to x1, y1, x2, y2
+  if (gradientType === "linear") {
+    const a = angle - 90 + 360;
+    const angleRad = (a * Math.PI) / 180;
+    const x1 = 50 - Math.cos(angleRad) * 50;
+    const y1 = 50 - Math.sin(angleRad) * 50;
+    const x2 = 50 + Math.cos(angleRad) * 50;
+    const y2 = 50 + Math.sin(angleRad) * 50;
 
-      const a = angle - 90 + 360;
-      const angleRad = (a * Math.PI) / 180;
-      const x1 = 50 - Math.cos(angleRad) * 50;
-      const y1 = 50 - Math.sin(angleRad) * 50;
-      const x2 = 50 + Math.cos(angleRad) * 50;
-      const y2 = 50 + Math.sin(angleRad) * 50;
-
-      gradientDef = `
+    gradientDef = `
       <defs>
         <linearGradient id="${gradientId}" x1="${x1}%" y1="${y1}%" x2="${x2}%" y2="${y2}%">
           ${gradientStops}
         </linearGradient>
       </defs>
     `;
-    } else if (gradientType === "radial") {
-      gradientDef = `
+  } else if (gradientType === "radial") {
+    gradientDef = `
       <defs>
         <radialGradient id="${gradientId}" cx="50%" cy="50%" r="50%">
           ${gradientStops}
         </radialGradient>
       </defs>
     `;
-    } else if (gradientType === "conic") {
-      gradientDef = `
+  } else if (gradientType === "conic") {
+    gradientDef = `
       <defs>
         <radialGradient id="${gradientId}" cx="50%" cy="50%" r="50%">
           ${gradientStops}
         </radialGradient>
       </defs>
     `;
-    }
+  }
 
-    // Clean and inject SVG
-    let modifiedSvg = svgContent
-      .replace(/<style[^>]*>.*?<\/style>/gs, "")
-      .replace(/fill="[^"]*"/g, "")
-      .replace(/stroke="[^"]*"/g, "")
-      .replace(/<svg([^>]*)>/, (match, p1) => {
-        if (gradientType === "conic") {
-          return `<svg${p1}>${gradientDef}`;
-        } else {
-          return `<svg${p1}><defs>${gradientDef}</defs>`;
-        }
-      })
+  // Clean and inject SVG
+  let modifiedSvg = svgContent
+    .replace(/<style[^>]*>.*?<\/style>/gs, "")
+    .replace(/fill="[^"]*"/g, "")
+    .replace(/stroke="[^"]*"/g, "")
+    .replace(/<svg([^>]*)>/, (match, p1) => {
+      return `<svg${p1}><defs>${gradientDef}</defs>`;
+    });
 
-      .replace(
-        /<(path|rect|circle|polygon|ellipse|g)(\s|>)/g,
-        `<$1 fill="url(#${gradientId})"$2`
-      );
-
-    return (
-      <div
-        className="p-4 w-[320px] bg-white"
-        dangerouslySetInnerHTML={{ __html: modifiedSvg }}
-      />
+  // Apply fill based on colorTarget
+  if (colorTarget === "logo" || colorTarget === "all") {
+    // Apply gradient fill
+    modifiedSvg = modifiedSvg.replace(
+      /<(path|rect|circle|polygon|ellipse|g)(\s|>)/g,
+      `<$1 fill="url(#${gradientId})"$2`
     );
-  };
+  } else {
+    // Apply solid black fill
+    modifiedSvg = modifiedSvg.replace(
+      /<(path|rect|circle|polygon|ellipse|g)(\s|>)/g,
+      `<$1 fill="#000000"$2`
+    );
+  }
+
+  return (
+    <div
+      className="p-4 w-[320px] bg-white"
+      dangerouslySetInnerHTML={{ __html: modifiedSvg }}
+    />
+  );
+};
+
 
   return (
     <div
       className="card"
-      style={{
-        background: gradientCSS,
-        padding: "24px",
-        minHeight: "100vh",
-      }}
+      style={
+        colorTarget === "background" || colorTarget === "all"
+          ? {
+              background: gradientCSS,
+              padding: "24px",
+              minHeight: "100vh",
+            }
+          : {
+              background: "#e3dade",
+              padding: "24px",
+              minHeight: "100vh",
+            }
+      }
     >
       <div className="flex flex-col items-center justify-center min-h-screen">
         <div className="w-full max-w-[800px] bg-white p-6 rounded-xl shadow-md space-y-8">
