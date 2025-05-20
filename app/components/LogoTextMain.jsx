@@ -1,7 +1,8 @@
 "use client";
 import React, { useState } from "react";
-import LogoTextColor from "./LogoTextColor";
+// import LogoTextColor from "./LogoTextSolidColor/LogoTextColor";
 import GradientComponent from "./LogoTextGradientColor";
+import Main from "./LogoTextSolidColor/Main"
 
 function LogoTextMain() {
   const [colorType, setColorType] = useState("solid");
@@ -13,12 +14,13 @@ function LogoTextMain() {
       {/* Color Picker / Gradient Picker */}
       <div>
         {colorType === "solid" ? (
-          <LogoTextColor
+          <Main
             colorType={colorType}
             setColorType={setColorType}
             solidColor={solidColor}
             setSolidColor={setSolidColor}
           />
+          // <Main />
         ) : (
           <GradientComponent
             colorType={colorType}
