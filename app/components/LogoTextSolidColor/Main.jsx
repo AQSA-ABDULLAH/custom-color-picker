@@ -1,15 +1,24 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import LogoTextColor from "./LogoTextColor"; // make sure the path is correct
 import GradientComponent from "../LogoTextGradientalColor/LogoTextGradientColor";
 
-function Main({ colorType, setColorType}) {
+function Main({ colorType, setColorType }) {
   const [colorTarget, setColorTarget] = useState("all");
   const [bgColor, setBgColor] = useState("#ff0000");
-    const [solidColor, setSolidColor] = useState("#ff0000");
+  const [solidColor, setSolidColor] = useState("#ff0000");
+  const [bgGradient, setbgGradient] = useState("#ff0000"); // fallback color
+
+  // ✅ Load bgGradient from localStorage on mount
+  useEffect(() => {
+    const savedBgGradient = localStorage.getItem("bgGradient");
+    if (savedBgGradient) {
+      setbgGradient(savedBgGradient);
+    }
+  }, []);
 
   const containerStyle = {
-    backgroundColor: colorType === "solid" ? bgColor : solidColor,
+    background: colorType === "solid" ? bgColor : bgGradient, // ✅ use 'background' instead of 'backgroundColor' for gradients
     padding: "24px",
     minHeight: "100vh",
   };
@@ -49,7 +58,6 @@ function Main({ colorType, setColorType}) {
             </div>
           </section>
 
-          {/* Conditionally render LogoTextColor when 'all' is selected */}
           {colorType === "solid" ? (
             <LogoTextColor
               colorTarget={colorTarget}
@@ -63,6 +71,8 @@ function Main({ colorType, setColorType}) {
             />
           ) : (
             <GradientComponent
+              bgGradient={bgGradient}
+              setbgGradient={setbgGradient}
               colorTarget={colorTarget}
               setColorTarget={setColorTarget}
               colorType={colorType}
