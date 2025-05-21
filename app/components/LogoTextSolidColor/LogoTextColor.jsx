@@ -1,101 +1,29 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import iro from "@jaames/iro";
+import { RGBDisplay, HSVDisplay, OtherFormatsDisplay } from "./ColorDisplay"; // adjust path if needed
+import { hexToRGB, hexToHSV, rgbToHSLA, rgbToOklch } from "./colorUtils";
 
-// Helper functions
-const hexToRGB = (hex) => {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  return [r, g, b];
-};
-
-const hexToHSV = (hex) => {
-  const r = parseInt(hex.slice(1, 3), 16) / 255;
-  const g = parseInt(hex.slice(3, 5), 16) / 255;
-  const b = parseInt(hex.slice(5, 7), 16) / 255;
-
-  const max = Math.max(r, g, b);
-  const min = Math.min(r, g, b);
-  const delta = max - min;
-
-  let h = 0;
-  if (delta !== 0) {
-    if (max === r) h = ((g - b) / delta) % 6;
-    else if (max === g) h = (b - r) / delta + 2;
-    else h = (r - g) / delta + 4;
-    h = Math.round(h * 60);
-    if (h < 0) h += 360;
-  }
-
-  const s = max === 0 ? 0 : delta / max;
-  const v = max;
-
-  return [h, Math.round(s * 100), Math.round(v * 100)];
-};
-
-const rgbToHSLA = ([r, g, b]) => {
-  const a = 1;
-  r /= 255;
-  g /= 255;
-  b /= 255;
-  const max = Math.max(r, g, b),
-    min = Math.min(r, g, b);
-  let h,
-    s,
-    l = (max + min) / 2;
-
-  if (max === min) {
-    h = s = 0;
-  } else {
-    const d = max - min;
-    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-    switch (max) {
-      case r:
-        h = (g - b) / d + (g < b ? 6 : 0);
-        break;
-      case g:
-        h = (b - r) / d + 2;
-        break;
-      case b:
-        h = (r - g) / d + 4;
-        break;
-    }
-    h *= 60;
-  }
-
-  return `hsla(${Math.round(h)}, ${Math.round(s * 100)}%, ${Math.round(
-    l * 100
-  )}%, ${a})`;
-};
-
-const rgbToOklch = ([r, g, b]) => {
-  // Dummy conversion; replace with a real OKLCH converter for accurate values
-  return `oklch(${(r + g + b) / 3} 0.14 200)`;
-};
 
 function LogoTextColor({ solidColor, setSolidColor }) {
   const [logoFile, setLogoFile] = useState(null);
   const [svgContent, setSvgContent] = useState("");
   const [color, setColor] = useState(solidColor || "#ff0000");
-const [logoColor, setLogoColor] = useState("#ff0000");
-const [textColor, setTextColor] = useState("#ff0000");
-const [bgColor, setBgColor] = useState("#ffffff");
+  const [logoColor, setLogoColor] = useState("#ff0000");
+  const [textColor, setTextColor] = useState("#ff0000");
+  const [bgColor, setBgColor] = useState("#ffffff");
 
+  useEffect(() => {
+    const storedLogoColor = localStorage.getItem("logoColor");
+    const storedTextColor = localStorage.getItem("textColor");
+    const storedBgColor = localStorage.getItem("bgColor");
 
-useEffect(() => {
-  const storedLogoColor = localStorage.getItem("logoColor");
-  const storedTextColor = localStorage.getItem("textColor");
-  const storedBgColor = localStorage.getItem("bgColor");
-
-  if (storedLogoColor) setLogoColor(storedLogoColor);
-  if (storedTextColor) setTextColor(storedTextColor);
-  if (storedBgColor) setBgColor(storedBgColor);
-}, []);
-
+    if (storedLogoColor) setLogoColor(storedLogoColor);
+    if (storedTextColor) setTextColor(storedTextColor);
+    if (storedBgColor) setBgColor(storedBgColor);
+  }, []);
 
   const [bio, setBio] = useState("");
-  
 
   useEffect(() => {
     localStorage.setItem("logoColor", logoColor);
@@ -158,12 +86,10 @@ useEffect(() => {
 
     // Determine if logo color should be changed
 
-coloredSvg = coloredSvg.replace(
-  /<svg([^>]*)>/,
-  `<svg$1><style>* { fill: ${logoColor} !important; }</style>`
-);
-
-
+    coloredSvg = coloredSvg.replace(
+      /<svg([^>]*)>/,
+      `<svg$1><style>* { fill: ${logoColor} !important; }</style>`
+    );
 
     return (
       <div
@@ -207,14 +133,14 @@ coloredSvg = coloredSvg.replace(
           <div>
             <label className="block font-medium mb-1">Your Bio:</label>
             <textarea
-            rows={4}
+              rows={4}
               className="w-[320px] p-2 border rounded text-[15px] font-bold"
               placeholder="Write a short bio here..."
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               style={{
                 color: textColor,
-                backgroundColor: bgColor,
+                backgroundColor: "#fffff",
               }}
             />
           </div>
@@ -236,51 +162,9 @@ coloredSvg = coloredSvg.replace(
           />
         </section>
 
-        <div className="grid grid-cols-3 gap-4">
-          {[
-            { label: "r", value: r },
-            { label: "g", value: g },
-            { label: "b", value: b },
-          ].map((item, i) => (
-            <div key={i} className="flex gap-3 items-center">
-              <label className="text-gray-600 capitalize">{item.label}</label>
-              <div className="w-[80px] border px-2 py-1 text-center rounded">
-                {item.value}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-3 gap-4">
-          {[
-            { label: "h", value: h },
-            { label: "s", value: s },
-            { label: "v", value: v },
-          ].map((item, i) => (
-            <div key={i} className="flex gap-3 items-center">
-              <label className="text-gray-600 capitalize">{item.label}</label>
-              <div className="w-[80px] border px-2 py-1 text-center rounded">
-                {item.value}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="space-y-4 text-sm w-full">
-          <div className="flex justify-between items-center px-4 py-2 bg-gray-100 rounded-md shadow">
-            <span className="font-semibold text-gray-800">HSLA</span>
-            <code className="text-xs px-2 py-1 bg-white text-blue-700 rounded">
-              {hsla}
-            </code>
-          </div>
-
-          <div className="flex justify-between items-center px-4 py-2 bg-gray-100 rounded-md shadow">
-            <span className="font-semibold text-gray-800">OKLCH</span>
-            <code className="text-xs px-2 py-1 bg-white text-green-700 rounded">
-              {oklchString}
-            </code>
-          </div>
-        </div>
+        <RGBDisplay r={r} g={g} b={b} />
+        <HSVDisplay h={h} s={s} v={v} />
+        <OtherFormatsDisplay hsla={hsla} oklchString={oklchString} />
       </div>
     </div>
   );
