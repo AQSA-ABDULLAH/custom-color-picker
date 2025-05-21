@@ -1,20 +1,21 @@
 "use client";
 import React, { useState } from "react";
 import LogoTextColor from "./LogoTextColor"; // make sure the path is correct
+import GradientComponent from "../LogoTextGradientalColor/LogoTextGradientColor";
 
-function Main({ colorType, setColorType, solidColor, setSolidColor }) {
+function Main({ colorType, setColorType}) {
   const [colorTarget, setColorTarget] = useState("all");
- const [bgColor, setBgColor] = useState("#ff0000");
+  const [bgColor, setBgColor] = useState("#ff0000");
+    const [solidColor, setSolidColor] = useState("#ff0000");
+
+  const containerStyle = {
+    backgroundColor: colorType === "solid" ? bgColor : solidColor,
+    padding: "24px",
+    minHeight: "100vh",
+  };
 
   return (
-    <div
-      className="card"
-      style={{
-        backgroundColor: bgColor,
-        padding: "24px",
-        minHeight: "100vh",
-      }}
-    >
+    <div className="card" style={containerStyle}>
       <div className="flex items-center justify-center min-h-screen">
         <div className="w-[50rem] bg-white px-6 py-6 shadow rounded space-y-8">
           <section className="flex items-center justify-between">
@@ -49,17 +50,26 @@ function Main({ colorType, setColorType, solidColor, setSolidColor }) {
           </section>
 
           {/* Conditionally render LogoTextColor when 'all' is selected */}
-
-          <LogoTextColor
-            colorTarget={colorTarget}
-            setColorTarget={setColorTarget}
-            colorType={colorType}
-            setColorType={setColorType}
-            solidColor={solidColor}
-            setSolidColor={setSolidColor}
-            bgColor={bgColor}
-            setBgColor={setBgColor}
-          />
+          {colorType === "solid" ? (
+            <LogoTextColor
+              colorTarget={colorTarget}
+              setColorTarget={setColorTarget}
+              colorType={colorType}
+              setColorType={setColorType}
+              solidColor={solidColor}
+              setSolidColor={setSolidColor}
+              bgColor={bgColor}
+              setBgColor={setBgColor}
+            />
+          ) : (
+            <GradientComponent
+              colorTarget={colorTarget}
+              setColorTarget={setColorTarget}
+              colorType={colorType}
+              setColorType={setColorType}
+              initialGradientColors={[solidColor, "#ffffff"]}
+            />
+          )}
         </div>
       </div>
     </div>

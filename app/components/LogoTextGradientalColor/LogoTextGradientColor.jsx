@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import ColorPickerGroup from "./ColorPickerGroup";
+import ColorPickerGroup from "../ColorPickerGroup";
 
 const hexToRGB = (hex) => {
   const r = parseInt(hex.slice(1, 3), 16);
@@ -42,6 +42,8 @@ const hexToCMYK = (hex) => {
 console.log(hexToCMYK("#ff9900")); // Output: [0, 0.4, 1, 0]
 
 export default function GradientComponent({
+  colorTarget,
+  setColorTarget,
   colorType,
   setColorType,
   initialGradientColors = ["#ff0000", "#ffffff"],
@@ -49,7 +51,6 @@ export default function GradientComponent({
   const [gradientColors, setGradientColors] = useState(initialGradientColors);
   const [hexInputs, setHexInputs] = useState(initialGradientColors);
   const [gradientType, setGradientType] = useState("linear");
-  const [colorTarget, setColorTarget] = useState("all"); // "logo", "text", "background", "all"
   const [angle, setAngle] = useState(90);
   // const [gradientAngle, setGradientAngle] = useState(90);
 
@@ -169,59 +170,10 @@ export default function GradientComponent({
 
 
   return (
-    <div
-      className="card"
-      style={
-        colorTarget === "background" || colorTarget === "all"
-          ? {
-              background: gradientCSS,
-              padding: "24px",
-              minHeight: "100vh",
-            }
-          : {
-              background: "#e3dade",
-              padding: "24px",
-              minHeight: "100vh",
-            }
-      }
-    >
+    
       <div className="flex flex-col items-center justify-center min-h-screen">
-        <div className="w-full max-w-[800px] bg-white p-6 rounded-xl shadow-md space-y-8">
-          <section className="flex  justify-between items-center">
-            <div>
-              <label htmlFor="colorType" className="block mb-2 font-semibold">
-                Select Color Type:
-              </label>
-              <select
-                value={colorType}
-                onChange={(e) => setColorType(e.target.value)}
-                className="border-1 border-black"
-              >
-                <option value="solid">Solid Color</option>
-                <option value="gradient">Gradient</option>
-              </select>
-            </div>
-
-            <div>
-              <label
-                htmlFor="colorTarget"
-                className="block mt-4 mb-2 font-semibold"
-              >
-                Select Color Target:
-              </label>
-              <select
-                value={colorTarget}
-                onChange={(e) => setColorTarget(e.target.value)}
-                className="border border-black px-2 py-1 rounded"
-              >
-                <option value="logo">Logo</option>
-                <option value="text">Text</option>
-                <option value="background">Background</option>
-                <option value="all">All</option>
-              </select>
-            </div>
-          </section>
-
+        <div className="w-full max-w-[800px] space-y-8">
+          
           <h3 className="text-xl font-semibold">CSS Gradient Generator</h3>
 
           <section className="flex flex-col lg:flex-row gap-8 items-center justify-between w-[100%]">
@@ -413,6 +365,6 @@ export default function GradientComponent({
           </div>
         </div>
       </div>
-    </div>
+
   );
 }
