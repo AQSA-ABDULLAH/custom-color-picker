@@ -51,7 +51,7 @@ function LogoTextColor({
   useEffect(() => {
     if (colorPickerRef.current && !pickerInstance.current) {
       pickerInstance.current = new iro.ColorPicker(colorPickerRef.current, {
-        width: 160,
+        width: 200,
         color: "#fff",
         borderWidth: 1,
         borderColor: "#fff",
@@ -81,6 +81,10 @@ function LogoTextColor({
         } else if (colorTarget === "text") {
           setTextColor(newColor.hexString);
         } else if (colorTarget === "background") {
+          setBgColor(newColor.hexString);
+        } else if (colorTarget === "all"){
+          setLogoColor(newColor.hexString);
+          setTextColor(newColor.hexString);
           setBgColor(newColor.hexString);
         }
       });
