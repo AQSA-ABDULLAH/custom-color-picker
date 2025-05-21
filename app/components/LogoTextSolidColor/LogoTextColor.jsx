@@ -158,16 +158,12 @@ useEffect(() => {
 
     // Determine if logo color should be changed
 
-    coloredSvg = coloredSvg.replace(
-      /<svg([^>]*)>/,
-      `<svg$1><style>* { fill: ${logoColor} !important; }</style>`
-    );
+coloredSvg = coloredSvg.replace(
+  /<svg([^>]*)>/,
+  `<svg$1><style>* { fill: ${logoColor} !important; }</style>`
+);
 
-    // If logo is not selected, keep original color or remove colorization
-    coloredSvg = coloredSvg.replace(
-      /<svg([^>]*)>/,
-      `<svg$1><style>* { fill: inherit; }</style>`
-    );
+
 
     return (
       <div
