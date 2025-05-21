@@ -3,13 +3,15 @@ import React, { useState } from "react";
 import LogoTextColor from "./LogoTextColor"; // make sure the path is correct
 
 function Main({ colorType, setColorType, solidColor, setSolidColor }) {
-  const [colorTarget, setColorTarget] = useState("all"); // "logo", "text", "background", "all"
+  const [colorTarget, setColorTarget] = useState("all");
+  const [bgColor, setBgColor] = useState("#ffffff");
+
 
   return (
     <div
       className="card"
       style={{
-        backgroundColor: solidColor,
+        backgroundColor: bgColor,
         padding: "24px",
         minHeight: "100vh",
       }}
@@ -50,13 +52,16 @@ function Main({ colorType, setColorType, solidColor, setSolidColor }) {
           {/* Conditionally render LogoTextColor when 'all' is selected */}
 
           <LogoTextColor
-            colorTarget={colorTarget}
-            setColorTarget={setColorTarget}
-            colorType={colorType}
-            setColorType={setColorType}
-            solidColor={solidColor}
-            setSolidColor={setSolidColor}
-          />
+  colorTarget={colorTarget}
+  setColorTarget={setColorTarget}
+  colorType={colorType}
+  setColorType={setColorType}
+  solidColor={solidColor}
+  setSolidColor={setSolidColor}
+  bgColor={bgColor}
+  setBgColor={setBgColor}
+/>
+
         </div>
       </div>
     </div>

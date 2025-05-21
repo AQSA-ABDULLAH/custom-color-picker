@@ -9,13 +9,15 @@ function LogoTextColor({
   setColorTarget,
   solidColor,
   setSolidColor,
+  bgColor,
+  setBgColor,
 }) {
+
   const [logoFile, setLogoFile] = useState(null);
   const [svgContent, setSvgContent] = useState("");
   const [color, setColor] = useState(solidColor || "#ff0000");
   const [logoColor, setLogoColor] = useState("#ff0000");
   const [textColor, setTextColor] = useState("#ff0000");
-  const [bgColor, setBgColor] = useState("#ffffff");
   const [bio, setBio] = useState("");
 
   const colorPickerRef = useRef(null);
@@ -50,7 +52,7 @@ function LogoTextColor({
     if (colorPickerRef.current && !pickerInstance.current) {
       pickerInstance.current = new iro.ColorPicker(colorPickerRef.current, {
         width: 160,
-        color: solidColor,
+        color: "#fff",
         borderWidth: 1,
         borderColor: "#fff",
         layout: [
