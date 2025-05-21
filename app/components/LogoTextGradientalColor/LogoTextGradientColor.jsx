@@ -43,21 +43,25 @@ const logoGradient = {
 
 
 useEffect(() => {
-  const generatedBgGradient = gradientCSS; // ✅ Rename here
-  const textGradient = gradientCSS;
-  const logoGradient = {
-    colors: gradientColors,
-    type: gradientType,
-    angle: angle,
-  };
+  const generatedGradient = gradientCSS;
 
-  localStorage.setItem("bgGradient", generatedBgGradient);
-  localStorage.setItem("textGradient", textGradient);
-  localStorage.setItem("logoGradient", JSON.stringify(logoGradient));
+  console.log(colorTarget)
 
-  // 🔥 Update parent state with correct variable
-  setbgGradient(generatedBgGradient); // ✅ now it's defined
-}, [gradientCSS, gradientColors, gradientType, angle]);
+  if (colorTarget === "text") {
+    localStorage.setItem("textGradient", generatedGradient);
+  } else if (colorTarget === "background" || colorTarget === "all") {
+    localStorage.setItem("bgGradient", generatedGradient);
+    setbgGradient(generatedGradient); // also update parent state
+  } else if (colorTarget === "logo" || colorTarget === "all") {
+    const logoGradient = {
+      colors: gradientColors,
+      type: gradientType,
+      angle,
+    };
+    localStorage.setItem("logoGradient", JSON.stringify(logoGradient));
+  }
+}, [gradientCSS, gradientColors, gradientType, angle, colorTarget]);
+
 
 
 
@@ -135,20 +139,14 @@ useEffect(() => {
         return `<svg${p1}><defs>${gradientDef}</defs>`;
       });
 
-    // Apply fill based on colorTarget
-    if (colorTarget === "logo" || colorTarget === "all") {
+   
       // Apply gradient fill
       modifiedSvg = modifiedSvg.replace(
         /<(path|rect|circle|polygon|ellipse|g)(\s|>)/g,
         `<$1 fill="url(#${gradientId})"$2`
       );
-    } else {
-      // Apply solid black fill
-      modifiedSvg = modifiedSvg.replace(
-        /<(path|rect|circle|polygon|ellipse|g)(\s|>)/g,
-        `<$1 fill="#000000"$2`
-      );
-    }
+    
+      
 
     return (
       <div
