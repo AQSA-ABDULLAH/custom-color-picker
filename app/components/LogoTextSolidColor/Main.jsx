@@ -4,8 +4,7 @@ import LogoTextColor from "./LogoTextColor"; // make sure the path is correct
 
 function Main({ colorType, setColorType, solidColor, setSolidColor }) {
   const [colorTarget, setColorTarget] = useState("all");
-  const [bgColor, setBgColor] = useState("#ffffff");
-
+ const [bgColor, setBgColor] = useState("#ff0000");
 
   return (
     <div
@@ -52,16 +51,15 @@ function Main({ colorType, setColorType, solidColor, setSolidColor }) {
           {/* Conditionally render LogoTextColor when 'all' is selected */}
 
           <LogoTextColor
-  colorTarget={colorTarget}
-  setColorTarget={setColorTarget}
-  colorType={colorType}
-  setColorType={setColorType}
-  solidColor={solidColor}
-  setSolidColor={setSolidColor}
-  bgColor={bgColor}
-  setBgColor={setBgColor}
-/>
-
+            colorTarget={colorTarget}
+            setColorTarget={setColorTarget}
+            colorType={colorType}
+            setColorType={setColorType}
+            solidColor={solidColor}
+            setSolidColor={setSolidColor}
+            bgColor={bgColor}
+            setBgColor={setBgColor}
+          />
         </div>
       </div>
     </div>

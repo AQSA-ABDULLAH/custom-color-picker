@@ -15,16 +15,21 @@ function LogoTextColor({
 
   const [logoFile, setLogoFile] = useState(null);
   const [svgContent, setSvgContent] = useState("");
-  const [color, setColor] = useState(solidColor || "#ff0000");
-  const [logoColor, setLogoColor] = useState("#ff0000");
-  const [textColor, setTextColor] = useState("#ff0000");
+const [color, setColor] = useState("#ff0000");
+const [logoColor, setLogoColor] = useState("#ff0000");
+const [textColor, setTextColor] = useState("#ff0000");
+
   const [bio, setBio] = useState("");
 
   const colorPickerRef = useRef(null);
   const pickerInstance = useRef(null);
 
+
+
   // Load from local storage on first render
   useEffect(() => {
+    localStorage.clear();
+
     const storedLogoColor = localStorage.getItem("logoColor");
     const storedTextColor = localStorage.getItem("textColor");
     const storedBgColor = localStorage.getItem("bgColor");
