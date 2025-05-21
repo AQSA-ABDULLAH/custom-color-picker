@@ -36,9 +36,14 @@ const hexToHSV = (hex) => {
 
 const rgbToHSLA = ([r, g, b]) => {
   const a = 1;
-  r /= 255; g /= 255; b /= 255;
-  const max = Math.max(r, g, b), min = Math.min(r, g, b);
-  let h, s, l = (max + min) / 2;
+  r /= 255;
+  g /= 255;
+  b /= 255;
+  const max = Math.max(r, g, b),
+    min = Math.min(r, g, b);
+  let h,
+    s,
+    l = (max + min) / 2;
 
   if (max === min) {
     h = s = 0;
@@ -46,14 +51,22 @@ const rgbToHSLA = ([r, g, b]) => {
     const d = max - min;
     s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
     switch (max) {
-      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-      case g: h = (b - r) / d + 2; break;
-      case b: h = (r - g) / d + 4; break;
+      case r:
+        h = (g - b) / d + (g < b ? 6 : 0);
+        break;
+      case g:
+        h = (b - r) / d + 2;
+        break;
+      case b:
+        h = (r - g) / d + 4;
+        break;
     }
     h *= 60;
   }
 
-  return `hsla(${Math.round(h)}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%, ${a})`;
+  return `hsla(${Math.round(h)}, ${Math.round(s * 100)}%, ${Math.round(
+    l * 100
+  )}%, ${a})`;
 };
 
 const rgbToOklch = ([r, g, b]) => {
@@ -61,12 +74,40 @@ const rgbToOklch = ([r, g, b]) => {
   return `oklch(${(r + g + b) / 3} 0.14 200)`;
 };
 
-function LogoTextColor({ colorType, setColorType, solidColor, setSolidColor }) {
+function LogoTextColor({ solidColor, setSolidColor }) {
   const [logoFile, setLogoFile] = useState(null);
   const [svgContent, setSvgContent] = useState("");
   const [color, setColor] = useState(solidColor || "#ff0000");
+const [logoColor, setLogoColor] = useState("#ff0000");
+const [textColor, setTextColor] = useState("#ff0000");
+const [bgColor, setBgColor] = useState("#ffffff");
+
+
+useEffect(() => {
+  const storedLogoColor = localStorage.getItem("logoColor");
+  const storedTextColor = localStorage.getItem("textColor");
+  const storedBgColor = localStorage.getItem("bgColor");
+
+  if (storedLogoColor) setLogoColor(storedLogoColor);
+  if (storedTextColor) setTextColor(storedTextColor);
+  if (storedBgColor) setBgColor(storedBgColor);
+}, []);
+
+
   const [bio, setBio] = useState("");
-  const [colorTarget, setColorTarget] = useState("all"); // "logo", "text", "background", "all"
+  
+
+  useEffect(() => {
+    localStorage.setItem("logoColor", logoColor);
+  }, [logoColor]);
+
+  useEffect(() => {
+    localStorage.setItem("textColor", textColor);
+  }, [textColor]);
+
+  useEffect(() => {
+    localStorage.setItem("bgColor", bgColor);
+  }, [bgColor]);
 
   const colorPickerRef = useRef(null);
   const pickerInstance = useRef(null);
@@ -88,14 +129,12 @@ function LogoTextColor({ colorType, setColorType, solidColor, setSolidColor }) {
 
       pickerInstance.current.on("color:change", (newColor) => {
         setSolidColor(newColor.hexString);
-        setColor(newColor.hexString);
+        setLogoColor(newColor.hexString); // For logo
+        setTextColor(newColor.hexString); // For text
+        setBgColor("#ffffff"); // Or set dynamically if your design supports it
       });
     }
   }, []);
-
-  useEffect(() => {
-    setSolidColor(color);
-  }, [color]);
 
   const handleLogoUpload = (e) => {
     const file = e.target.files?.[0];
@@ -114,10 +153,20 @@ function LogoTextColor({ colorType, setColorType, solidColor, setSolidColor }) {
   const renderSvgWithColor = () => {
     if (!svgContent) return null;
 
+    // Remove existing fill attributes
     let coloredSvg = svgContent.replace(/fill="[^"]*"/g, "");
+
+    // Determine if logo color should be changed
+
     coloredSvg = coloredSvg.replace(
       /<svg([^>]*)>/,
-      `<svg$1><style>* { fill: ${solidColor} !important; }</style>`
+      `<svg$1><style>* { fill: ${logoColor} !important; }</style>`
+    );
+
+    // If logo is not selected, keep original color or remove colorization
+    coloredSvg = coloredSvg.replace(
+      /<svg([^>]*)>/,
+      `<svg$1><style>* { fill: inherit; }</style>`
     );
 
     return (
@@ -135,89 +184,109 @@ function LogoTextColor({ colorType, setColorType, solidColor, setSolidColor }) {
   const oklchString = rgbToOklch([r, g, b]);
 
   return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="w-[50rem] space-y-8">
-      
-
-          <section className="flex items-start justify-between">
-            <div>
-              <div className="flex items-center gap-3">
-                <h3 className="font-semibold">Upload Logo:</h3>
-                <label className="flex items-center justify-center mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700 transition duration-300">
-                  Upload SVG
-                  <input type="file" accept=".svg" onChange={handleLogoUpload} className="hidden" />
-                </label>
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="w-[50rem] space-y-8">
+        <section className="flex items-start justify-between">
+          <div>
+            <div className="flex items-center gap-3">
+              <h3 className="font-semibold">Upload Logo:</h3>
+              <label className="flex items-center justify-center mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700 transition duration-300">
+                Upload SVG
+                <input
+                  type="file"
+                  accept=".svg"
+                  onChange={handleLogoUpload}
+                  className="hidden"
+                />
+              </label>
+            </div>
+            {logoFile && (
+              <div className="mt-4">
+                <p className="text-lg mb-1 font-semibold">Preview:</p>
+                {renderSvgWithColor()}
               </div>
-              {logoFile && (
-                <div className="mt-4">
-                  <p className="text-lg mb-1 font-semibold">Preview:</p>
-                  {renderSvgWithColor()}
-                </div>
-              )}
-            </div>
+            )}
+          </div>
 
-            <div>
-              <label className="block font-medium mb-1">Your Bio:</label>
-              <textarea
-                rows={4}
-                className="w-[320px] p-2 border rounded text-[15px] font-bold"
-                placeholder="Write a short bio here..."
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-                style={{ color: solidColor, backgroundColor: "#ffffff" }}
-              />
-            </div>
-          </section>
-
-          <section className="flex flex-col items-center gap-6">
-            <div>
-              <label className="font-medium">Logo & Text Color:</label>
-              <div ref={colorPickerRef} className="mt-2" />
-            </div>
-            <input
-              type="text"
-              value={color}
-              onChange={(e) => {
-                const hex = e.target.value;
-                setColor(hex);
+          <div>
+            <label className="block font-medium mb-1">Your Bio:</label>
+            <textarea
+            rows={4}
+              className="w-[320px] p-2 border rounded text-[15px] font-bold"
+              placeholder="Write a short bio here..."
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              style={{
+                color: textColor,
+                backgroundColor: bgColor,
               }}
-              className="text-[18px] border rounded-md px-4 py-1 w-[120px] bg-transparent"
             />
-          </section>
+          </div>
+        </section>
 
-          <div className="grid grid-cols-3 gap-4">
-            {[{ label: "r", value: r }, { label: "g", value: g }, { label: "b", value: b }].map((item, i) => (
-              <div key={i} className="flex gap-3 items-center">
-                <label className="text-gray-600 capitalize">{item.label}</label>
-                <div className="w-[80px] border px-2 py-1 text-center rounded">{item.value}</div>
+        <section className="flex flex-col items-center gap-6">
+          <div>
+            <label className="font-medium">Logo & Text Color:</label>
+            <div ref={colorPickerRef} className="mt-2" />
+          </div>
+          <input
+            type="text"
+            value={color}
+            onChange={(e) => {
+              const hex = e.target.value;
+              setColor(hex);
+            }}
+            className="text-[18px] border rounded-md px-4 py-1 w-[120px] bg-transparent"
+          />
+        </section>
+
+        <div className="grid grid-cols-3 gap-4">
+          {[
+            { label: "r", value: r },
+            { label: "g", value: g },
+            { label: "b", value: b },
+          ].map((item, i) => (
+            <div key={i} className="flex gap-3 items-center">
+              <label className="text-gray-600 capitalize">{item.label}</label>
+              <div className="w-[80px] border px-2 py-1 text-center rounded">
+                {item.value}
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
+        </div>
 
-          <div className="grid grid-cols-3 gap-4">
-            {[{ label: "h", value: h }, { label: "s", value: s }, { label: "v", value: v }].map((item, i) => (
-              <div key={i} className="flex gap-3 items-center">
-                <label className="text-gray-600 capitalize">{item.label}</label>
-                <div className="w-[80px] border px-2 py-1 text-center rounded">{item.value}</div>
+        <div className="grid grid-cols-3 gap-4">
+          {[
+            { label: "h", value: h },
+            { label: "s", value: s },
+            { label: "v", value: v },
+          ].map((item, i) => (
+            <div key={i} className="flex gap-3 items-center">
+              <label className="text-gray-600 capitalize">{item.label}</label>
+              <div className="w-[80px] border px-2 py-1 text-center rounded">
+                {item.value}
               </div>
-            ))}
+            </div>
+          ))}
+        </div>
+
+        <div className="space-y-4 text-sm w-full">
+          <div className="flex justify-between items-center px-4 py-2 bg-gray-100 rounded-md shadow">
+            <span className="font-semibold text-gray-800">HSLA</span>
+            <code className="text-xs px-2 py-1 bg-white text-blue-700 rounded">
+              {hsla}
+            </code>
           </div>
 
-          <div className="space-y-4 text-sm w-full">
-            <div className="flex justify-between items-center px-4 py-2 bg-gray-100 rounded-md shadow">
-              <span className="font-semibold text-gray-800">HSLA</span>
-              <code className="text-xs px-2 py-1 bg-white text-blue-700 rounded">{hsla}</code>
-            </div>
-
-            <div className="flex justify-between items-center px-4 py-2 bg-gray-100 rounded-md shadow">
-              <span className="font-semibold text-gray-800">OKLCH</span>
-              <code className="text-xs px-2 py-1 bg-white text-green-700 rounded">{oklchString}</code>
-            </div>
+          <div className="flex justify-between items-center px-4 py-2 bg-gray-100 rounded-md shadow">
+            <span className="font-semibold text-gray-800">OKLCH</span>
+            <code className="text-xs px-2 py-1 bg-white text-green-700 rounded">
+              {oklchString}
+            </code>
           </div>
-
         </div>
       </div>
-    
+    </div>
   );
 }
 

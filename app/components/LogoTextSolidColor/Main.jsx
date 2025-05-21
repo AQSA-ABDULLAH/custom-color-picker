@@ -31,10 +31,7 @@ function Main({ colorType, setColorType, solidColor, setSolidColor }) {
               </select>
             </div>
             <div>
-              <label
-                htmlFor="colorTarget"
-                className="block mb-2 font-semibold"
-              >
+              <label htmlFor="colorTarget" className="block mb-2 font-semibold">
                 Select Color Target:
               </label>
               <select
@@ -52,13 +49,13 @@ function Main({ colorType, setColorType, solidColor, setSolidColor }) {
 
           {/* Conditionally render LogoTextColor when 'all' is selected */}
           {colorTarget === "all" && (
-  <LogoTextColor
-    colorType={colorType}
-    solidColor={solidColor}
-    setSolidColor={setSolidColor}
-  />
-)}
-
+               <LogoTextColor
+            colorType={colorType}
+            setColorType={setColorType}
+            solidColor={solidColor}
+            setSolidColor={setSolidColor}
+          />
+          )}
         </div>
       </div>
     </div>

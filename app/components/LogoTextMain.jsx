@@ -1,8 +1,7 @@
 "use client";
 import React, { useState } from "react";
-// import LogoTextColor from "./LogoTextSolidColor/LogoTextColor";
 import GradientComponent from "./LogoTextGradientColor";
-import Main from "./LogoTextSolidColor/Main"
+import Main from "../components/LogoTextSolidColor/Main";
 
 function LogoTextMain() {
   const [colorType, setColorType] = useState("solid");
@@ -10,7 +9,6 @@ function LogoTextMain() {
 
   return (
     <div className="space-y-4">
-
       {/* Color Picker / Gradient Picker */}
       <div>
         {colorType === "solid" ? (
@@ -20,7 +18,6 @@ function LogoTextMain() {
             solidColor={solidColor}
             setSolidColor={setSolidColor}
           />
-          // <Main />
         ) : (
           <GradientComponent
             colorType={colorType}
