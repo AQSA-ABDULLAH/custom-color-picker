@@ -48,14 +48,15 @@ function Main({ colorType, setColorType, solidColor, setSolidColor }) {
           </section>
 
           {/* Conditionally render LogoTextColor when 'all' is selected */}
-          {colorTarget === "all" && (
-               <LogoTextColor
+
+          <LogoTextColor
+            colorTarget={colorTarget}
+            setColorTarget={setColorTarget}
             colorType={colorType}
             setColorType={setColorType}
             solidColor={solidColor}
             setSolidColor={setSolidColor}
           />
-          )}
         </div>
       </div>
     </div>

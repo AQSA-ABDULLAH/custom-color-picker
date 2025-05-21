@@ -1,18 +1,27 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import iro from "@jaames/iro";
-import { RGBDisplay, HSVDisplay, OtherFormatsDisplay } from "./ColorDisplay"; // adjust path if needed
+import { RGBDisplay, HSVDisplay, OtherFormatsDisplay } from "./ColorDisplay";
 import { hexToRGB, hexToHSV, rgbToHSLA, rgbToOklch } from "./colorUtils";
 
-
-function LogoTextColor({ solidColor, setSolidColor }) {
+function LogoTextColor({
+  colorTarget,
+  setColorTarget,
+  solidColor,
+  setSolidColor,
+}) {
   const [logoFile, setLogoFile] = useState(null);
   const [svgContent, setSvgContent] = useState("");
   const [color, setColor] = useState(solidColor || "#ff0000");
   const [logoColor, setLogoColor] = useState("#ff0000");
   const [textColor, setTextColor] = useState("#ff0000");
   const [bgColor, setBgColor] = useState("#ffffff");
+  const [bio, setBio] = useState("");
 
+  const colorPickerRef = useRef(null);
+  const pickerInstance = useRef(null);
+
+  // Load from local storage on first render
   useEffect(() => {
     const storedLogoColor = localStorage.getItem("logoColor");
     const storedTextColor = localStorage.getItem("textColor");
@@ -23,8 +32,7 @@ function LogoTextColor({ solidColor, setSolidColor }) {
     if (storedBgColor) setBgColor(storedBgColor);
   }, []);
 
-  const [bio, setBio] = useState("");
-
+  // Save to local storage when colors update
   useEffect(() => {
     localStorage.setItem("logoColor", logoColor);
   }, [logoColor]);
@@ -37,9 +45,7 @@ function LogoTextColor({ solidColor, setSolidColor }) {
     localStorage.setItem("bgColor", bgColor);
   }, [bgColor]);
 
-  const colorPickerRef = useRef(null);
-  const pickerInstance = useRef(null);
-
+  // Initialize the color picker once
   useEffect(() => {
     if (colorPickerRef.current && !pickerInstance.current) {
       pickerInstance.current = new iro.ColorPicker(colorPickerRef.current, {
@@ -54,16 +60,32 @@ function LogoTextColor({ solidColor, setSolidColor }) {
           { component: iro.ui.Slider, options: { sliderType: "alpha" } },
         ],
       });
-
-      pickerInstance.current.on("color:change", (newColor) => {
-        setSolidColor(newColor.hexString);
-        setLogoColor(newColor.hexString); // For logo
-        setTextColor(newColor.hexString); // For text
-        setBgColor("#ffffff"); // Or set dynamically if your design supports it
-      });
     }
   }, []);
 
+  // Update listener when colorTarget changes
+  useEffect(() => {
+    if (pickerInstance.current) {
+      pickerInstance.current.off("color:change"); // remove old listener
+
+      pickerInstance.current.on("color:change", (newColor) => {
+        setSolidColor(newColor.hexString);
+        setColor(newColor.hexString);
+
+        console.log("Current Target:", colorTarget);
+
+        if (colorTarget === "logo") {
+          setLogoColor(newColor.hexString);
+        } else if (colorTarget === "text") {
+          setTextColor(newColor.hexString);
+        } else if (colorTarget === "background") {
+          setBgColor(newColor.hexString);
+        }
+      });
+    }
+  }, [colorTarget]);
+
+  // Logo upload handler
   const handleLogoUpload = (e) => {
     const file = e.target.files?.[0];
     if (file && file.type === "image/svg+xml") {
@@ -78,14 +100,11 @@ function LogoTextColor({ solidColor, setSolidColor }) {
     }
   };
 
+  // Modify SVG to inject color
   const renderSvgWithColor = () => {
     if (!svgContent) return null;
 
-    // Remove existing fill attributes
     let coloredSvg = svgContent.replace(/fill="[^"]*"/g, "");
-
-    // Determine if logo color should be changed
-
     coloredSvg = coloredSvg.replace(
       /<svg([^>]*)>/,
       `<svg$1><style>* { fill: ${logoColor} !important; }</style>`
@@ -100,6 +119,7 @@ function LogoTextColor({ solidColor, setSolidColor }) {
     );
   };
 
+  // Convert for display
   const [r, g, b] = hexToRGB(color);
   const [h, s, v] = hexToHSV(color);
   const hsla = rgbToHSLA([r, g, b]);
@@ -109,6 +129,7 @@ function LogoTextColor({ solidColor, setSolidColor }) {
     <div className="flex items-center justify-center min-h-screen">
       <div className="w-[50rem] space-y-8">
         <section className="flex items-start justify-between">
+          {/* Upload SVG */}
           <div>
             <div className="flex items-center gap-3">
               <h3 className="font-semibold">Upload Logo:</h3>
@@ -130,6 +151,7 @@ function LogoTextColor({ solidColor, setSolidColor }) {
             )}
           </div>
 
+          {/* Bio TextArea */}
           <div>
             <label className="block font-medium mb-1">Your Bio:</label>
             <textarea
@@ -146,6 +168,7 @@ function LogoTextColor({ solidColor, setSolidColor }) {
           </div>
         </section>
 
+        {/* Color Picker */}
         <section className="flex flex-col items-center gap-6">
           <div>
             <label className="font-medium">Logo & Text Color:</label>
@@ -157,11 +180,13 @@ function LogoTextColor({ solidColor, setSolidColor }) {
             onChange={(e) => {
               const hex = e.target.value;
               setColor(hex);
+              setSolidColor(hex);
             }}
             className="text-[18px] border rounded-md px-4 py-1 w-[120px] bg-transparent"
           />
         </section>
 
+        {/* Color Info */}
         <RGBDisplay r={r} g={g} b={b} />
         <HSVDisplay h={h} s={s} v={v} />
         <OtherFormatsDisplay hsla={hsla} oklchString={oklchString} />
