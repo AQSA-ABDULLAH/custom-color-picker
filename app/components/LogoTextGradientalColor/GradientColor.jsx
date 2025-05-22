@@ -98,12 +98,19 @@ function GradientColor({
 
     gradient.setAttribute("id", "gradient");
     gradient.setAttribute("gradientUnits", "userSpaceOnUse");
-
-    const angleRad = (angle * Math.PI) / 180;
+ const a = angle - 90 + 360;
+    const angleRad = (a * Math.PI) / 180;
     const x1 = 50 - 50 * Math.cos(angleRad);
     const y1 = 50 - 50 * Math.sin(angleRad);
     const x2 = 50 + 50 * Math.cos(angleRad);
     const y2 = 50 + 50 * Math.sin(angleRad);
+
+    // const a = angle - 90 + 360;
+    //   const angleRad = (a * Math.PI) / 180;
+    //   const x1 = 50 - Math.cos(angleRad) * 50;
+    //   const y1 = 50 - Math.sin(angleRad) * 50;
+    //   const x2 = 50 + Math.cos(angleRad) * 50;
+    //   const y2 = 50 + Math.sin(angleRad) * 50;
 
     gradient.setAttribute("x1", `${x1}%`);
     gradient.setAttribute("y1", `${y1}%`);
