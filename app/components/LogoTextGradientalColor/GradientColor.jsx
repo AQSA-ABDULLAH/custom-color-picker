@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import ColorPickerGroup from "../ColorPickerGroup";
 
 function GradientColor({
   bgGradient,
@@ -9,23 +10,23 @@ function GradientColor({
   setColorType,
   initialGradientColors = ["#ff0000", "#ffffff"],
 }) {
-  const [color1, setColor1] = useState(initialGradientColors[0]);
-const [color2, setColor2] = useState(initialGradientColors[1]);
-const [angle, setAngle] = useState(90);
+  const [gradientColors, setGradientColors] = useState(initialGradientColors);
+  const color1 = gradientColors[0];
+const color2 = gradientColors[1];
 
-const [bio, setBio] = useState("Write a short bio here...");
-const [uploadedSVG, setUploadedSVG] = useState("");
+  const [hexInputs, setHexInputs] = useState(initialGradientColors);
+  const [gradientType, setGradientType] = useState("linear");
+  const [angle, setAngle] = useState(90);
+  const [bio, setBio] = useState("Write a short bio here...");
+  const [uploadedSVG, setUploadedSVG] = useState("");
 
-// MUST be declared after color1, color2, and angle
-const textGradient = `linear-gradient(${angle}deg, ${color1}, ${color2})`;
+  const textGradient = `linear-gradient(${angle}deg, ${color1}, ${color2})`;
 
-// Load previous text gradient on mount
-const [storedTextGradient, setStoredTextGradient] = useState(() =>
-  localStorage.getItem("textGradient") || textGradient
-);
+  const [storedTextGradient, setStoredTextGradient] = useState(
+    () => localStorage.getItem("textGradient") || textGradient
+  );
 
-
-  // Update background gradient only when target is "background" or "all"
+ // Update background gradient only when target is "background" or "all"
   useEffect(() => {
     if (colorTarget === "background" || colorTarget === "all") {
       const gradientString = `linear-gradient(${angle}deg, ${color1}, ${color2})`;
@@ -34,17 +35,14 @@ const [storedTextGradient, setStoredTextGradient] = useState(() =>
     }
   }, [color1, color2, angle, setbgGradient]);
 
-  // Update text gradient only when target is "text" or "all"
   useEffect(() => {
-  if (colorTarget === "text" || colorTarget === "all") {
-    const gradientString = `linear-gradient(${angle}deg, ${color1}, ${color2})`;
-    localStorage.setItem("textGradient", gradientString);
-    setStoredTextGradient(gradientString);
-  }
-}, [color1, color2, angle, colorTarget]);
+    if (colorTarget === "text" || colorTarget === "all") {
+      const gradientString = `linear-gradient(${angle}deg, ${color1}, ${color2})`;
+      localStorage.setItem("textGradient", gradientString);
+      setStoredTextGradient(gradientString);
+    }
+  }, [color1, color2, angle, colorTarget]);
 
-
-  // Update logo gradient only when target is "logo" or "all"
   useEffect(() => {
     if ((colorTarget === "logo" || colorTarget === "all") && uploadedSVG) {
       const updatedSVG = injectGradientToSVG(
@@ -57,7 +55,6 @@ const [storedTextGradient, setStoredTextGradient] = useState(() =>
     }
   }, [color1, color2, angle, uploadedSVG, colorTarget]);
 
-  // Handle SVG Upload
   const handleSVGUpload = (e) => {
     const file = e.target.files[0];
     if (file && file.type === "image/svg+xml") {
@@ -78,23 +75,20 @@ const [storedTextGradient, setStoredTextGradient] = useState(() =>
     }
   };
 
-  // Inject gradient into SVG string
   const injectGradientToSVG = (originalSVG, color1, color2, angle) => {
     const parser = new DOMParser();
     const svgDoc = parser.parseFromString(originalSVG, "image/svg+xml");
     const svgEl = svgDoc.documentElement;
 
-    // Remove old defs
     const existingDefs = svgEl.querySelector("defs");
-    if (existingDefs) {
-      svgEl.removeChild(existingDefs);
-    }
+    if (existingDefs) svgEl.removeChild(existingDefs);
 
     const defs = svgDoc.createElementNS("http://www.w3.org/2000/svg", "defs");
     const gradient = svgDoc.createElementNS(
       "http://www.w3.org/2000/svg",
       "linearGradient"
     );
+
     gradient.setAttribute("id", "gradient");
     gradient.setAttribute("gradientUnits", "userSpaceOnUse");
 
@@ -132,19 +126,17 @@ const [storedTextGradient, setStoredTextGradient] = useState(() =>
     ];
     fillableTags.forEach((tag) => {
       const elements = svgEl.getElementsByTagName(tag);
-      for (let el of elements) {
+      Array.from(elements).forEach((el) => {
         el.setAttribute("fill", "url(#gradient)");
         el.removeAttribute("style");
-      }
+      });
     });
 
-    const serializer = new XMLSerializer();
-    return serializer.serializeToString(svgEl);
+    return new XMLSerializer().serializeToString(svgEl);
   };
 
   return (
     <div className="space-y-6">
-      {/* Gradient Angle Input */}
       <div>
         <label className="block font-semibold mb-1">
           Gradient Angle (deg):
@@ -159,29 +151,20 @@ const [storedTextGradient, setStoredTextGradient] = useState(() =>
         />
       </div>
 
-      {/* Color Pickers */}
-      <div className="flex gap-4">
-        <div>
-          <label className="block font-semibold mb-1">Color 1:</label>
-          <input
-            type="color"
-            value={color1}
-            onChange={(e) => setColor1(e.target.value)}
-            className="w-12 h-12 p-0 border border-black rounded"
-          />
-        </div>
-        <div>
-          <label className="block font-semibold mb-1">Color 2:</label>
-          <input
-            type="color"
-            value={color2}
-            onChange={(e) => setColor2(e.target.value)}
-            className="w-12 h-12 p-0 border border-black rounded"
-          />
-        </div>
-      </div>
+      <ColorPickerGroup
+        gradientColors={gradientColors}
+        setGradientColors={setGradientColors}
+        hexInputs={hexInputs}
+        setHexInputs={setHexInputs}
+        setColor={(newColor, index) => {
+          setGradientColors((prev) => {
+            const updated = [...prev];
+            updated[index] = newColor;
+            return updated;
+          });
+        }}
+      />
 
-      {/* Bio with Gradient Text */}
       <div className="space-y-2">
         <label className="block font-semibold mb-1">Your Bio:</label>
         <textarea
@@ -191,17 +174,16 @@ const [storedTextGradient, setStoredTextGradient] = useState(() =>
           onChange={(e) => setBio(e.target.value)}
           placeholder="Write your bio here..."
           style={{
-            backgroundColor: "#ffffff",
-            backgroundImage: colorTarget === "text" || colorTarget === "all"
-      ? textGradient
-      : storedTextGradient,
+            backgroundImage:
+              colorTarget === "text" || colorTarget === "all"
+                ? textGradient
+                : storedTextGradient,
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
           }}
         />
       </div>
 
-      {/* SVG Upload */}
       <div className="space-y-2">
         <label className="block font-semibold mb-1">Upload SVG Logo:</label>
         <input
@@ -210,8 +192,6 @@ const [storedTextGradient, setStoredTextGradient] = useState(() =>
           onChange={handleSVGUpload}
           className="block border border-black p-1 rounded w-fit"
         />
-
-        {/* Preview Area */}
         {uploadedSVG && (
           <div
             className="mt-4 p-4 border rounded"
