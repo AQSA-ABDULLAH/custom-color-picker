@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import LogoTextColor from "./LogoTextColor"; // make sure the path is correct
-import GradientComponent from "../LogoTextGradientalColor/LogoTextGradientColor";
+import GradientColor from "../LogoTextGradientalColor/GradientColor";
 
 function Main({ colorType, setColorType }) {
   const [colorTarget, setColorTarget] = useState("all");
@@ -18,7 +18,7 @@ function Main({ colorType, setColorType }) {
   }, []);
 
   const containerStyle = {
-    background: colorType === "solid" ? bgColor : bgGradient, // ✅ use 'background' instead of 'backgroundColor' for gradients
+    background: colorType === "solid" ? bgColor : bgGradient, 
     padding: "24px",
     minHeight: "100vh",
   };
@@ -70,7 +70,7 @@ function Main({ colorType, setColorType }) {
               setBgColor={setBgColor}
             />
           ) : (
-            <GradientComponent
+            <GradientColor
               bgGradient={bgGradient}
               setbgGradient={setbgGradient}
               colorTarget={colorTarget}
@@ -87,3 +87,33 @@ function Main({ colorType, setColorType }) {
 }
 
 export default Main;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // <GradientComponent
+  //             bgGradient={bgGradient}
+  //             setbgGradient={setbgGradient}
+  //             colorTarget={colorTarget}
+  //             setColorTarget={setColorTarget}
+  //             colorType={colorType}
+  //             setColorType={setColorType}
+  //             initialGradientColors={[solidColor, "#ffffff"]}
+  //           />
