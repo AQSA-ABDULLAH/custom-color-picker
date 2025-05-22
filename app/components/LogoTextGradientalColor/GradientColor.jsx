@@ -10,13 +10,20 @@ function GradientColor({
   initialGradientColors = ["#ff0000", "#ffffff"],
 }) {
   const [color1, setColor1] = useState(initialGradientColors[0]);
-  const [color2, setColor2] = useState(initialGradientColors[1]);
-  
-  const [angle, setAngle] = useState(90);
-  const [bio, setBio] = useState("Write a short bio here...");
-  const [uploadedSVG, setUploadedSVG] = useState("");
+const [color2, setColor2] = useState(initialGradientColors[1]);
+const [angle, setAngle] = useState(90);
 
-  const textGradient = `linear-gradient(${angle}deg, ${color1}, ${color2})`;
+const [bio, setBio] = useState("Write a short bio here...");
+const [uploadedSVG, setUploadedSVG] = useState("");
+
+// MUST be declared after color1, color2, and angle
+const textGradient = `linear-gradient(${angle}deg, ${color1}, ${color2})`;
+
+// Load previous text gradient on mount
+const [storedTextGradient, setStoredTextGradient] = useState(() =>
+  localStorage.getItem("textGradient") || textGradient
+);
+
 
   // Update background gradient only when target is "background" or "all"
   useEffect(() => {
@@ -29,11 +36,13 @@ function GradientColor({
 
   // Update text gradient only when target is "text" or "all"
   useEffect(() => {
-    if (colorTarget === "text" || colorTarget === "all") {
-      const gradientString = `linear-gradient(${angle}deg, ${color1}, ${color2})`;
-      localStorage.setItem("textGradient", gradientString);
-    }
-  }, [color1, color2, angle, colorTarget]);
+  if (colorTarget === "text" || colorTarget === "all") {
+    const gradientString = `linear-gradient(${angle}deg, ${color1}, ${color2})`;
+    localStorage.setItem("textGradient", gradientString);
+    setStoredTextGradient(gradientString);
+  }
+}, [color1, color2, angle, colorTarget]);
+
 
   // Update logo gradient only when target is "logo" or "all"
   useEffect(() => {
@@ -183,7 +192,9 @@ function GradientColor({
           placeholder="Write your bio here..."
           style={{
             backgroundColor: "#ffffff",
-            backgroundImage: textGradient,
+            backgroundImage: colorTarget === "text" || colorTarget === "all"
+      ? textGradient
+      : storedTextGradient,
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
           }}
