@@ -11,32 +11,42 @@ function GradientColor({
 }) {
   const [color1, setColor1] = useState(initialGradientColors[0]);
   const [color2, setColor2] = useState(initialGradientColors[1]);
+  
   const [angle, setAngle] = useState(90);
   const [bio, setBio] = useState("Write a short bio here...");
   const [uploadedSVG, setUploadedSVG] = useState("");
 
   const textGradient = `linear-gradient(${angle}deg, ${color1}, ${color2})`;
 
-  // Inject gradient and update targets on change
+  // Update background gradient only when target is "background" or "all"
   useEffect(() => {
-    const gradientString = `linear-gradient(${angle}deg, ${color1}, ${color2})`;
-
     if (colorTarget === "background" || colorTarget === "all") {
+      const gradientString = `linear-gradient(${angle}deg, ${color1}, ${color2})`;
       setbgGradient(gradientString);
       localStorage.setItem("bgGradient", gradientString);
     }
+  }, [color1, color2, angle, setbgGradient]);
 
+  // Update text gradient only when target is "text" or "all"
+  useEffect(() => {
     if (colorTarget === "text" || colorTarget === "all") {
+      const gradientString = `linear-gradient(${angle}deg, ${color1}, ${color2})`;
       localStorage.setItem("textGradient", gradientString);
     }
+  }, [color1, color2, angle, colorTarget]);
 
-    if (colorTarget === "logo" || colorTarget === "all") {
-      if (uploadedSVG) {
-        const updatedSVG = injectGradientToSVG(uploadedSVG, color1, color2, angle);
-        setUploadedSVG(updatedSVG);
-      }
+  // Update logo gradient only when target is "logo" or "all"
+  useEffect(() => {
+    if ((colorTarget === "logo" || colorTarget === "all") && uploadedSVG) {
+      const updatedSVG = injectGradientToSVG(
+        uploadedSVG,
+        color1,
+        color2,
+        angle
+      );
+      setUploadedSVG(updatedSVG);
     }
-  }, [color1, color2, angle, uploadedSVG, setbgGradient]);
+  }, [color1, color2, angle, uploadedSVG, colorTarget]);
 
   // Handle SVG Upload
   const handleSVGUpload = (e) => {
@@ -45,7 +55,12 @@ function GradientColor({
       const reader = new FileReader();
       reader.onload = () => {
         const originalSVG = reader.result;
-        const updatedSVG = injectGradientToSVG(originalSVG, color1, color2, angle);
+        const updatedSVG = injectGradientToSVG(
+          originalSVG,
+          color1,
+          color2,
+          angle
+        );
         setUploadedSVG(updatedSVG);
       };
       reader.readAsText(file);
@@ -67,7 +82,10 @@ function GradientColor({
     }
 
     const defs = svgDoc.createElementNS("http://www.w3.org/2000/svg", "defs");
-    const gradient = svgDoc.createElementNS("http://www.w3.org/2000/svg", "linearGradient");
+    const gradient = svgDoc.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "linearGradient"
+    );
     gradient.setAttribute("id", "gradient");
     gradient.setAttribute("gradientUnits", "userSpaceOnUse");
 
@@ -95,7 +113,14 @@ function GradientColor({
     defs.appendChild(gradient);
     svgEl.insertBefore(defs, svgEl.firstChild);
 
-    const fillableTags = ["path", "rect", "circle", "ellipse", "polygon", "text"];
+    const fillableTags = [
+      "path",
+      "rect",
+      "circle",
+      "ellipse",
+      "polygon",
+      "text",
+    ];
     fillableTags.forEach((tag) => {
       const elements = svgEl.getElementsByTagName(tag);
       for (let el of elements) {
@@ -112,7 +137,9 @@ function GradientColor({
     <div className="space-y-6">
       {/* Gradient Angle Input */}
       <div>
-        <label className="block font-semibold mb-1">Gradient Angle (deg):</label>
+        <label className="block font-semibold mb-1">
+          Gradient Angle (deg):
+        </label>
         <input
           type="number"
           value={angle}
@@ -186,4 +213,3 @@ function GradientColor({
 }
 
 export default GradientColor;
-

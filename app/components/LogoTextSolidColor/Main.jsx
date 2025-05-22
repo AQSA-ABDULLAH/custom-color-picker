@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+
 import LogoTextColor from "./LogoTextColor"; // make sure the path is correct
 import GradientColor from "../LogoTextGradientalColor/GradientColor";
 
